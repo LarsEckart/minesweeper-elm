@@ -1,0 +1,6 @@
+[build]
+  command = "./build_project.sh"
+  publish = "dist"
+
+[build.environment]
+  ELM_VERSION = "0.19.1"
