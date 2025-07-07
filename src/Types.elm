@@ -22,6 +22,7 @@ type alias Model =
     { board : Board
     , gameState : GameState
     , difficulty : Difficulty
+    , isFirstClick : Bool
     }
 
 

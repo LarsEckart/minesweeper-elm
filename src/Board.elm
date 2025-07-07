@@ -1,4 +1,4 @@
-module Board exposing (empty, revealCell, view, withMines)
+module Board exposing (empty, revealCell, view, withMines, withMinesAvoidingPosition)
 
 import Array
 import Cell
@@ -47,6 +47,27 @@ withMines rows cols mineCount seed =
 
         ( minePositions, _ ) =
             Random.step (selectRandomPositions mineCount positions) seed
+    in
+    empty rows cols
+        |> placeMines minePositions
+        |> calculateAdjacentMines rows cols
+
+
+withMinesAvoidingPosition : Int -> Int -> Int -> Random.Seed -> Int -> Int -> Board
+withMinesAvoidingPosition rows cols mineCount seed avoidRow avoidCol =
+    let
+        avoidPosition =
+            { row = avoidRow, col = avoidCol }
+
+        avoidPositions =
+            avoidPosition :: getAdjacentPositions rows cols avoidRow avoidCol
+
+        availablePositions =
+            generateAllPositions rows cols
+                |> List.filter (\pos -> not (List.member pos avoidPositions))
+
+        ( minePositions, _ ) =
+            Random.step (selectRandomPositions mineCount availablePositions) seed
     in
     empty rows cols
         |> placeMines minePositions

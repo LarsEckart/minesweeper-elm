@@ -4,7 +4,7 @@ import Board
 import Browser
 import Html exposing (Html, div, h1, text)
 import Random
-import Types exposing (Board)
+import Types exposing (Board, GameState(..), Model, Msg(..))
 
 
 main : Program () Model Msg
@@ -17,15 +17,6 @@ main =
         }
 
 
-type alias Model =
-    { board : Board
-    }
-
-
-type Msg
-    = CellClicked Int Int
-
-
 init : () -> ( Model, Cmd Msg )
 init _ =
     let
@@ -35,14 +26,81 @@ init _ =
         board =
             Board.withMines 9 9 10 seed
     in
-    ( { board = board }, Cmd.none )
+    ( { board = board
+      , gameState = Playing
+      , difficulty = Types.Beginner
+      , isFirstClick = True
+      }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CellClicked row col ->
-            ( { model | board = Board.revealCell row col model.board }, Cmd.none )
+            if model.isFirstClick then
+                handleFirstClick row col model
+
+            else
+                ( { model | board = Board.revealCell row col model.board }, Cmd.none )
+
+        CellRightClicked row col ->
+            -- TODO: Implement right-click functionality for flagging
+            ( model, Cmd.none )
+
+        NewGame difficulty ->
+            -- TODO: Implement new game functionality
+            ( model, Cmd.none )
+
+        NoOp ->
+            ( model, Cmd.none )
+
+
+handleFirstClick : Int -> Int -> Model -> ( Model, Cmd Msg )
+handleFirstClick row col model =
+    let
+        -- Check if the clicked cell would be a mine
+        clickedCell =
+            getCellAt model.board row col
+
+        needsRegeneration =
+            case clickedCell of
+                Just cell ->
+                    cell.isMine || cell.adjacentMines > 0
+
+                Nothing ->
+                    False
+
+        newBoard =
+            if needsRegeneration then
+                -- Regenerate board avoiding the clicked position and its neighbors
+                let
+                    seed =
+                        Random.initialSeed 42
+                in
+                Board.withMinesAvoidingPosition 9 9 10 seed row col
+
+            else
+                model.board
+
+        updatedBoard =
+            Board.revealCell row col newBoard
+    in
+    ( { model
+        | board = updatedBoard
+        , isFirstClick = False
+      }
+    , Cmd.none
+    )
+
+
+getCellAt : Board -> Int -> Int -> Maybe Types.Cell
+getCellAt board row col =
+    board
+        |> List.drop row
+        |> List.head
+        |> Maybe.andThen (List.drop col >> List.head)
 
 
 view : Model -> Html Msg

@@ -250,6 +250,108 @@ suite =
                         Nothing ->
                             Expect.fail "Could not get cell at position (0,0)"
             ]
+        , describe "withMinesAvoidingPosition"
+            [ test "avoids placing mines at the specified position" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 4 4
+
+                        centerCell =
+                            getCell board 4 4
+                    in
+                    case centerCell of
+                        Just cell ->
+                            cell.isMine
+                                |> Expect.equal False
+
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (4,4)"
+            , test "avoids placing mines in adjacent positions" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 4 4
+
+                        adjacentPositions =
+                            [ ( 3, 3 )
+                            , ( 3, 4 )
+                            , ( 3, 5 )
+                            , ( 4, 3 )
+                            , ( 4, 5 )
+                            , ( 5, 3 )
+                            , ( 5, 4 )
+                            , ( 5, 5 )
+                            ]
+
+                        adjacentCells =
+                            List.filterMap (\( row, col ) -> getCell board row col) adjacentPositions
+
+                        hasAnyMines =
+                            List.any .isMine adjacentCells
+                    in
+                    hasAnyMines
+                        |> Expect.equal False
+            , test "ensures clicked position has zero adjacent mines" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 4 4
+
+                        centerCell =
+                            getCell board 4 4
+                    in
+                    case centerCell of
+                        Just cell ->
+                            cell.adjacentMines
+                                |> Expect.equal 0
+
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (4,4)"
+            , test "creates board with correct mine count when avoiding position" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 4 4
+
+                        mineCount =
+                            countMines board
+                    in
+                    mineCount
+                        |> Expect.equal 10
+            , test "different positions create different boards" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board1 =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 1 1
+
+                        board2 =
+                            Board.withMinesAvoidingPosition 9 9 10 seed 7 7
+
+                        mines1 =
+                            getMinePositions board1
+
+                        mines2 =
+                            getMinePositions board2
+                    in
+                    mines1
+                        |> Expect.notEqual mines2
+            ]
         ]
 
 
