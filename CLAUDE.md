@@ -17,6 +17,7 @@ A modern Minesweeper game built with Elm 0.19
 
 ### Workflow
 
+0. Ask which issue on GitHub we shall tackle
 1. Read a issue on GitHub using GitHub CLI
 2. Create a branch for your feature
 3. Implement your changes and **verify everything you did!**
