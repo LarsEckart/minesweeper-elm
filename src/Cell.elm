@@ -4,6 +4,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (on, onClick, preventDefaultOn)
 import Json.Decode as Decode
+import Time
 import Types exposing (Cell, CellState(..))
 
 

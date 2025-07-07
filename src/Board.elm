@@ -5,6 +5,7 @@ import Cell
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Random
+import Time
 import Types exposing (Board, Cell, CellState(..))
 
 

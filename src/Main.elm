@@ -5,6 +5,8 @@ import Browser
 import Html exposing (Html, div, h1, text)
 import Html.Attributes
 import Random
+import Task
+import Time
 import Types exposing (Board, GameState(..), Model, Msg(..))
 
 
@@ -56,10 +58,16 @@ update msg model =
             handleRightClick row col model
 
         CellTouchStart row col ->
-            handleTouchStart row col model
+            ( model, Task.perform (TouchStartWithTime row col) Time.now )
 
         CellTouchEnd row col ->
-            handleTouchEnd row col model
+            ( model, Task.perform (TouchEndWithTime row col) Time.now )
+
+        TouchStartWithTime row col time ->
+            handleTouchStart row col time model
+
+        TouchEndWithTime row col time ->
+            handleTouchEnd row col time model
 
         NewGame difficulty ->
             -- TODO: Implement new game functionality
@@ -220,21 +228,21 @@ handleRightClick row col model =
         )
 
 
-handleTouchStart : Int -> Int -> Model -> ( Model, Cmd Msg )
-handleTouchStart row col model =
+handleTouchStart : Int -> Int -> Time.Posix -> Model -> ( Model, Cmd Msg )
+handleTouchStart row col time model =
     -- Don't handle touch if game is over
     if model.gameState /= Playing then
         ( model, Cmd.none )
 
     else
-        -- Record the touch start (simplified without timestamp for now)
-        ( { model | touchStart = Just { row = row, col = col, time = 0 } }
+        -- Record the touch start with timestamp
+        ( { model | touchStart = Just { row = row, col = col, time = time } }
         , Cmd.none
         )
 
 
-handleTouchEnd : Int -> Int -> Model -> ( Model, Cmd Msg )
-handleTouchEnd row col model =
+handleTouchEnd : Int -> Int -> Time.Posix -> Model -> ( Model, Cmd Msg )
+handleTouchEnd row col endTime model =
     -- Don't handle touch if game is over
     if model.gameState /= Playing then
         ( model, Cmd.none )
@@ -243,14 +251,27 @@ handleTouchEnd row col model =
         case model.touchStart of
             Just touchData ->
                 if touchData.row == row && touchData.col == col then
-                    -- Same cell, check if it was a long press (simulate 500ms)
-                    -- For now, we'll treat any touch as a long press since we can't
-                    -- easily get timestamp in pure Elm without subscriptions
+                    -- Same cell, check if it was a long press (500ms)
                     let
+                        duration =
+                            Time.posixToMillis endTime - Time.posixToMillis touchData.time
+
                         updatedModel =
                             { model | touchStart = Nothing }
                     in
-                    handleRightClick row col updatedModel
+                    if duration >= 500 then
+                        -- Long press, flag the cell
+                        handleRightClick row col updatedModel
+
+                    else
+                    -- Short tap, reveal the cell
+                    if
+                        model.isFirstClick
+                    then
+                        handleFirstClick row col updatedModel
+
+                    else
+                        handleCellClick row col updatedModel
 
                 else
                     -- Different cell, reset touch state
@@ -258,7 +279,11 @@ handleTouchEnd row col model =
 
             Nothing ->
                 -- No touch start recorded, treat as regular click
-                handleCellClick row col model
+                if model.isFirstClick then
+                    handleFirstClick row col model
+
+                else
+                    handleCellClick row col model
 
 
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell

@@ -1,5 +1,7 @@
 module Types exposing (..)
 
+import Time
+
 
 type CellState
     = Hidden
@@ -24,7 +26,7 @@ type alias Model =
     , difficulty : Difficulty
     , isFirstClick : Bool
     , mineCount : Int
-    , touchStart : Maybe { row : Int, col : Int, time : Int }
+    , touchStart : Maybe { row : Int, col : Int, time : Time.Posix }
     }
 
 
@@ -45,5 +47,7 @@ type Msg
     | CellRightClicked Int Int
     | CellTouchStart Int Int
     | CellTouchEnd Int Int
+    | TouchStartWithTime Int Int Time.Posix
+    | TouchEndWithTime Int Int Time.Posix
     | NewGame Difficulty
     | NoOp
