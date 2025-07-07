@@ -150,11 +150,11 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for win/loss conditions
 - **Output**: Playable game with end states
 
-### Task 7: Flood Fill Algorithm
-- [ ] Implement flood-fill for revealing connected zeros
-- [ ] Ensure flood-fill triggers on first click
-- [ ] Add comprehensive tests for edge cases
-- [ ] Optimize for performance
+### Task 7: Flood Fill Algorithm ✅
+- [x] Implement flood-fill for revealing connected zeros
+- [x] Ensure flood-fill triggers on first click
+- [x] Add comprehensive tests for edge cases
+- [x] Optimize for performance
 - **Output**: Zeros auto-reveal neighbors
 
 ### Task 8: Flag Functionality

@@ -1,4 +1,4 @@
-module Board exposing (empty, isLoss, isWin, revealAllMines, revealCell, view, withMines, withMinesAvoidingPosition)
+module Board exposing (empty, isLoss, isWin, revealAllMines, revealCell, revealCellWithFloodFill, view, withMines, withMinesAvoidingPosition)
 
 import Array
 import Cell
@@ -220,6 +220,113 @@ revealCell row col board =
                 cells
         )
         board
+
+
+{-| Reveal a cell with flood fill logic for zero cells
+-}
+revealCellWithFloodFill : Int -> Int -> Board -> Board
+revealCellWithFloodFill row col board =
+    let
+        rows =
+            List.length board
+
+        cols =
+            List.head board |> Maybe.map List.length |> Maybe.withDefault 0
+
+        clickedCell =
+            getCellAt board { row = row, col = col }
+    in
+    case clickedCell of
+        Just cell ->
+            if cell.state == Revealed then
+                -- Cell already revealed, no action needed
+                board
+
+            else if cell.isMine then
+                -- Just reveal the mine, no flood fill
+                revealCell row col board
+
+            else if cell.adjacentMines == 0 then
+                -- Zero cell, trigger flood fill
+                floodFill rows cols board { row = row, col = col }
+
+            else
+                -- Number cell, just reveal it
+                revealCell row col board
+
+        Nothing ->
+            -- Invalid position, no action
+            board
+
+
+{-| Flood fill algorithm that reveals connected zero cells and their border cells
+-}
+floodFill : Int -> Int -> Board -> Position -> Board
+floodFill rows cols board startPosition =
+    let
+        -- Set to track visited positions to avoid infinite loops
+        visited =
+            []
+
+        -- Queue for BFS flood fill
+        queue =
+            [ startPosition ]
+
+        -- Use helper function to process the flood fill
+        result =
+            floodFillHelper rows cols board visited queue
+    in
+    result.board
+
+
+{-| Helper function for flood fill using BFS approach
+-}
+floodFillHelper : Int -> Int -> Board -> List Position -> List Position -> { board : Board, visited : List Position }
+floodFillHelper rows cols board visited queue =
+    case queue of
+        [] ->
+            -- No more positions to process
+            { board = board, visited = visited }
+
+        currentPos :: remainingQueue ->
+            if List.member currentPos visited then
+                -- Already visited this position, skip it
+                floodFillHelper rows cols board visited remainingQueue
+
+            else
+                case getCellAt board currentPos of
+                    Just cell ->
+                        if cell.state == Revealed then
+                            -- Already revealed, skip
+                            floodFillHelper rows cols board visited remainingQueue
+
+                        else
+                            -- Reveal this cell
+                            let
+                                newBoard =
+                                    revealCell currentPos.row currentPos.col board
+
+                                newVisited =
+                                    currentPos :: visited
+                            in
+                            if cell.adjacentMines == 0 && not cell.isMine then
+                                -- This is a zero cell, add its neighbors to the queue
+                                let
+                                    neighbors =
+                                        getAdjacentPositions rows cols currentPos.row currentPos.col
+
+                                    newQueue =
+                                        remainingQueue ++ neighbors
+                                in
+                                floodFillHelper rows cols newBoard newVisited newQueue
+
+                            else
+                                -- This is a border cell (has adjacent mines), don't expand further
+                                floodFillHelper rows cols newBoard newVisited remainingQueue
+
+                    Nothing ->
+                        -- Invalid position, skip
+                        floodFillHelper rows cols board visited remainingQueue
 
 
 {-| Check if the game is lost by determining if a mine was revealed

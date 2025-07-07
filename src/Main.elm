@@ -90,7 +90,7 @@ handleFirstClick row col model =
                 model.board
 
         updatedBoard =
-            Board.revealCell row col newBoard
+            Board.revealCellWithFloodFill row col newBoard
 
         -- Check win/loss conditions after first click
         newGameState =
@@ -124,7 +124,7 @@ handleCellClick : Int -> Int -> Model -> ( Model, Cmd Msg )
 handleCellClick row col model =
     let
         updatedBoard =
-            Board.revealCell row col model.board
+            Board.revealCellWithFloodFill row col model.board
 
         -- Check win/loss conditions after click
         newGameState =

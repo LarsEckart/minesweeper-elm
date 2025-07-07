@@ -480,6 +480,234 @@ suite =
                         _ ->
                             Expect.fail "Could not get cells from board"
             ]
+        , describe "flood fill algorithm"
+            [ test "revealCellWithFloodFill reveals single zero cell" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with no mines
+                        board =
+                            Board.empty 3 3
+                                |> Board.revealCellWithFloodFill 1 1
+                                
+                        centerCell =
+                            getCell board 1 1
+                    in
+                    case centerCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Revealed
+                        Nothing ->
+                            Expect.fail "Could not get center cell"
+            , test "revealCellWithFloodFill reveals connected zero region" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with no mines (all zeros)
+                        board =
+                            Board.empty 3 3
+                                |> Board.revealCellWithFloodFill 0 0
+                                
+                        allCells =
+                            [ getCell board 0 0, getCell board 0 1, getCell board 0 2
+                            , getCell board 1 0, getCell board 1 1, getCell board 1 2
+                            , getCell board 2 0, getCell board 2 1, getCell board 2 2
+                            ]
+                                |> List.filterMap identity
+                    in
+                    allCells
+                        |> List.all (\cell -> cell.state == Revealed)
+                        |> Expect.equal True
+            , test "revealCellWithFloodFill stops at border cells with numbers" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with one mine at (0,0)
+                        board =
+                            Board.empty 3 3
+                                |> placeMineAt 0 0
+                                |> calculateAdjacentMinesForBoard 3 3
+                                |> Board.revealCellWithFloodFill 2 2
+                                
+                        -- Cell (2,2) should be revealed (it's zero)
+                        bottomRightCell =
+                            getCell board 2 2
+                            
+                        -- Cell (1,1) should be revealed (it's a number but connected to zero region)
+                        centerCell =
+                            getCell board 1 1
+                            
+                        -- Cell (0,1) should be revealed (it's a number but connected to zero region)
+                        topMiddleCell =
+                            getCell board 0 1
+                            
+                        -- Cell (1,0) should be revealed (it's a number but connected to zero region)
+                        middleLeftCell =
+                            getCell board 1 0
+                    in
+                    case (bottomRightCell, centerCell) of
+                        (Just cell22, Just cell11) ->
+                            case (topMiddleCell, middleLeftCell) of
+                                (Just cell01, Just cell10) ->
+                                    Expect.all
+                                        [ \_ -> cell22.state |> Expect.equal Revealed
+                                        , \_ -> cell11.state |> Expect.equal Revealed
+                                        , \_ -> cell01.state |> Expect.equal Revealed
+                                        , \_ -> cell10.state |> Expect.equal Revealed
+                                        ] ()
+                                _ ->
+                                    Expect.fail "Could not get expected cells"
+                        _ ->
+                            Expect.fail "Could not get expected cells"
+            , test "revealCellWithFloodFill does not reveal mines" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with mines at corners
+                        board =
+                            Board.empty 3 3
+                                |> placeMineAt 0 0
+                                |> placeMineAt 0 2
+                                |> placeMineAt 2 0
+                                |> placeMineAt 2 2
+                                |> calculateAdjacentMinesForBoard 3 3
+                                |> Board.revealCellWithFloodFill 1 1
+                                
+                        -- Center cell should be revealed (it's a number)
+                        centerCell =
+                            getCell board 1 1
+                            
+                        -- Corner mines should NOT be revealed
+                        topLeftMine =
+                            getCell board 0 0
+                            
+                        topRightMine =
+                            getCell board 0 2
+                            
+                        bottomLeftMine =
+                            getCell board 2 0
+                            
+                        bottomRightMine =
+                            getCell board 2 2
+                    in
+                    case (centerCell, topLeftMine, topRightMine) of
+                        (Just center, Just tl, Just tr) ->
+                            case (bottomLeftMine, bottomRightMine) of
+                                (Just bl, Just br) ->
+                                    Expect.all
+                                        [ \_ -> center.state |> Expect.equal Revealed
+                                        , \_ -> tl.state |> Expect.equal Hidden
+                                        , \_ -> tr.state |> Expect.equal Hidden
+                                        , \_ -> bl.state |> Expect.equal Hidden
+                                        , \_ -> br.state |> Expect.equal Hidden
+                                        ] ()
+                                _ ->
+                                    Expect.fail "Could not get expected cells"
+                        _ ->
+                            Expect.fail "Could not get expected cells"
+            , test "revealCellWithFloodFill handles already revealed cells" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with no mines, reveal center cell, then flood fill again
+                        board =
+                            Board.empty 3 3
+                                |> Board.revealCell 1 1
+                                |> Board.revealCellWithFloodFill 1 1
+                                
+                        centerCell =
+                            getCell board 1 1
+                    in
+                    case centerCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Revealed
+                        Nothing ->
+                            Expect.fail "Could not get center cell"
+            , test "revealCellWithFloodFill handles clicking on mine" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with mine at center
+                        board =
+                            Board.empty 3 3
+                                |> placeMineAt 1 1
+                                |> Board.revealCellWithFloodFill 1 1
+                                
+                        centerCell =
+                            getCell board 1 1
+                            
+                        -- Other cells should remain hidden
+                        cornerCell =
+                            getCell board 0 0
+                    in
+                    case (centerCell, cornerCell) of
+                        (Just mine, Just corner) ->
+                            Expect.all
+                                [ \_ -> mine.state |> Expect.equal Revealed
+                                , \_ -> corner.state |> Expect.equal Hidden
+                                ] ()
+                        _ ->
+                            Expect.fail "Could not get expected cells"
+            , test "revealCellWithFloodFill handles invalid position" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board and try to reveal invalid position
+                        board =
+                            Board.empty 3 3
+                                |> Board.revealCellWithFloodFill 5 5
+                                
+                        -- Board should remain unchanged
+                        allCells =
+                            [ getCell board 0 0, getCell board 0 1, getCell board 0 2
+                            , getCell board 1 0, getCell board 1 1, getCell board 1 2
+                            , getCell board 2 0, getCell board 2 1, getCell board 2 2
+                            ]
+                                |> List.filterMap identity
+                    in
+                    allCells
+                        |> List.all (\cell -> cell.state == Hidden)
+                        |> Expect.equal True
+            , test "revealCellWithFloodFill reveals border cells around zero region" <|
+                \_ ->
+                    let
+                        -- Create a 5x5 board with mines in corners to create a zero region in center
+                        board =
+                            Board.empty 5 5
+                                |> placeMineAt 0 0
+                                |> placeMineAt 0 4
+                                |> placeMineAt 4 0
+                                |> placeMineAt 4 4
+                                |> calculateAdjacentMinesForBoard 5 5
+                                |> Board.revealCellWithFloodFill 2 2
+                                
+                        -- Center should be revealed (zero)
+                        centerCell =
+                            getCell board 2 2
+                            
+                        -- Adjacent cells should be revealed (numbers)
+                        topCell =
+                            getCell board 1 2
+                            
+                        bottomCell =
+                            getCell board 3 2
+                            
+                        leftCell =
+                            getCell board 2 1
+                            
+                        rightCell =
+                            getCell board 2 3
+                    in
+                    case (centerCell, topCell, bottomCell) of
+                        (Just center, Just top, Just bottom) ->
+                            case (leftCell, rightCell) of
+                                (Just left, Just right) ->
+                                    Expect.all
+                                        [ \_ -> center.state |> Expect.equal Revealed
+                                        , \_ -> top.state |> Expect.equal Revealed
+                                        , \_ -> bottom.state |> Expect.equal Revealed
+                                        , \_ -> left.state |> Expect.equal Revealed
+                                        , \_ -> right.state |> Expect.equal Revealed
+                                        ] ()
+                                _ ->
+                                    Expect.fail "Could not get expected cells"
+                        _ ->
+                            Expect.fail "Could not get expected cells"
+            ]
         ]
 
 
@@ -545,3 +773,52 @@ placeMineAt targetRow targetCol board =
                 cells
         )
         board
+
+
+{-| Helper function to calculate adjacent mines for a board (for testing) -}
+calculateAdjacentMinesForBoard : Int -> Int -> Board -> Board
+calculateAdjacentMinesForBoard rows cols board =
+    List.indexedMap (calculateAdjacentMinesInRowForBoard rows cols board) board
+
+
+calculateAdjacentMinesInRowForBoard : Int -> Int -> Board -> Int -> List Cell -> List Cell
+calculateAdjacentMinesInRowForBoard rows cols board row cells =
+    List.indexedMap (\col cell -> calculateAdjacentMinesInCellForBoard rows cols board row col cell) cells
+
+
+calculateAdjacentMinesInCellForBoard : Int -> Int -> Board -> Int -> Int -> Cell -> Cell
+calculateAdjacentMinesInCellForBoard rows cols board row col cell =
+    if cell.isMine then
+        cell
+    else
+        { cell | adjacentMines = countAdjacentMinesForBoard rows cols board row col }
+
+
+countAdjacentMinesForBoard : Int -> Int -> Board -> Int -> Int -> Int
+countAdjacentMinesForBoard rows cols board row col =
+    getAdjacentPositionsForBoard rows cols row col
+        |> List.map (getCellAtForBoard board)
+        |> List.filter (Maybe.map .isMine >> Maybe.withDefault False)
+        |> List.length
+
+
+getAdjacentPositionsForBoard : Int -> Int -> Int -> Int -> List { row : Int, col : Int }
+getAdjacentPositionsForBoard rows cols row col =
+    [ { row = row - 1, col = col - 1 }
+    , { row = row - 1, col = col }
+    , { row = row - 1, col = col + 1 }
+    , { row = row, col = col - 1 }
+    , { row = row, col = col + 1 }
+    , { row = row + 1, col = col - 1 }
+    , { row = row + 1, col = col }
+    , { row = row + 1, col = col + 1 }
+    ]
+        |> List.filter (\pos -> pos.row >= 0 && pos.row < rows && pos.col >= 0 && pos.col < cols)
+
+
+getCellAtForBoard : Board -> { row : Int, col : Int } -> Maybe Cell
+getCellAtForBoard board position =
+    board
+        |> List.drop position.row
+        |> List.head
+        |> Maybe.andThen (List.drop position.col >> List.head)
