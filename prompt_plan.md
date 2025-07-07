@@ -173,13 +173,13 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Test on mobile browser
 - **Output**: Long-press flagging on mobile
 
-### Task 10: Timer Implementation
-- [ ] Create Timer.elm module
-- [ ] Add timer to Model (seconds elapsed)
-- [ ] Start timer on first reveal
-- [ ] Stop timer on win/loss
-- [ ] Display timer in UI (temporary position)
-- [ ] Write tests for timer logic
+### Task 10: Timer Implementation ✅
+- [x] Create Timer.elm module
+- [x] Add timer to Model (seconds elapsed)
+- [x] Start timer on first reveal
+- [x] Stop timer on win/loss
+- [x] Display timer in UI (temporary position)
+- [x] Write tests for timer logic
 - **Output**: Working game timer
 
 ### Task 11: Reset Button

@@ -1,6 +1,7 @@
 module Types exposing (..)
 
 import Time
+import Timer
 
 
 type CellState
@@ -27,6 +28,7 @@ type alias Model =
     , isFirstClick : Bool
     , mineCount : Int
     , touchStart : Maybe { row : Int, col : Int, time : Time.Posix }
+    , timer : Timer.Timer
     }
 
 
@@ -50,4 +52,5 @@ type Msg
     | TouchStartWithTime Int Int Time.Posix
     | TouchEndWithTime Int Int Time.Posix
     | NewGame Difficulty
+    | TimerTick Time.Posix
     | NoOp

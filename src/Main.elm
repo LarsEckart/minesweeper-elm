@@ -7,6 +7,7 @@ import Html.Attributes
 import Random
 import Task
 import Time
+import Timer
 import Types exposing (Board, GameState(..), Model, Msg(..))
 
 
@@ -16,7 +17,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -35,6 +36,7 @@ init _ =
       , isFirstClick = True
       , mineCount = 10
       , touchStart = Nothing
+      , timer = Timer.init
       }
     , Cmd.none
     )
@@ -72,6 +74,9 @@ update msg model =
         NewGame difficulty ->
             -- TODO: Implement new game functionality
             ( model, Cmd.none )
+
+        TimerTick _ ->
+            ( { model | timer = Timer.tick model.timer }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -130,6 +135,7 @@ handleFirstClick row col model =
         | board = finalBoard
         , gameState = newGameState
         , isFirstClick = False
+        , timer = Timer.start
       }
     , Cmd.none
     )
@@ -178,6 +184,12 @@ handleCellClick row col model =
         ( { model
             | board = finalBoard
             , gameState = newGameState
+            , timer =
+                if newGameState /= Playing then
+                    Timer.stop model.timer
+
+                else
+                    model.timer
           }
         , Cmd.none
         )
@@ -286,6 +298,16 @@ handleTouchEnd row col endTime model =
                     handleCellClick row col model
 
 
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    case model.gameState of
+        Playing ->
+            Time.every 1000 TimerTick
+
+        _ ->
+            Sub.none
+
+
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell
 getCellAt board row col =
     board
@@ -300,6 +322,7 @@ view model =
         [ h1 [] [ text "Minesweeper" ]
         , gameStatusView model.gameState
         , mineCounterView model.mineCount
+        , timerView model.timer
         , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
         ]
 
@@ -308,6 +331,19 @@ mineCounterView : Int -> Html Msg
 mineCounterView mineCount =
     div [ Html.Attributes.style "font-size" "16px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
         [ text ("💣 " ++ String.fromInt mineCount) ]
+
+
+timerView : Timer.Timer -> Html Msg
+timerView timer =
+    let
+        seconds =
+            Timer.getSeconds timer
+
+        timeText =
+            Timer.formatTime seconds
+    in
+    div [ Html.Attributes.style "font-size" "16px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
+        [ text ("⏱️ " ++ timeText) ]
 
 
 gameStatusView : GameState -> Html Msg

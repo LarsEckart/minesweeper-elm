@@ -436,23 +436,25 @@ suite =
                                 |> placeMineAt 0 0
                                 |> placeMineAt 1 1
                                 |> Board.revealAllMines
-                                
+
                         mineAt00 =
                             getCell board 0 0
-                            
+
                         mineAt11 =
                             getCell board 1 1
-                            
+
                         nonMineAt01 =
                             getCell board 0 1
                     in
-                    case (mineAt00, mineAt11, nonMineAt01) of
-                        (Just cell00, Just cell11, Just cell01) ->
+                    case ( mineAt00, mineAt11, nonMineAt01 ) of
+                        ( Just cell00, Just cell11, Just cell01 ) ->
                             Expect.all
                                 [ \_ -> cell00.state |> Expect.equal Revealed
                                 , \_ -> cell11.state |> Expect.equal Revealed
                                 , \_ -> cell01.state |> Expect.equal Hidden
-                                ] ()
+                                ]
+                                ()
+
                         _ ->
                             Expect.fail "Could not get cells from board"
             , test "revealAllMines does not affect non-mine cells" <|
@@ -464,19 +466,21 @@ suite =
                                 |> placeMineAt 0 0
                                 |> Board.revealCell 0 1
                                 |> Board.revealAllMines
-                                
+
                         revealedNonMine =
                             getCell board 0 1
-                            
+
                         hiddenNonMine =
                             getCell board 1 0
                     in
-                    case (revealedNonMine, hiddenNonMine) of
-                        (Just cell01, Just cell10) ->
+                    case ( revealedNonMine, hiddenNonMine ) of
+                        ( Just cell01, Just cell10 ) ->
                             Expect.all
                                 [ \_ -> cell01.state |> Expect.equal Revealed
                                 , \_ -> cell10.state |> Expect.equal Hidden
-                                ] ()
+                                ]
+                                ()
+
                         _ ->
                             Expect.fail "Could not get cells from board"
             ]
@@ -488,7 +492,7 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.revealCellWithFloodFill 1 1
-                                
+
                         centerCell =
                             getCell board 1 1
                     in
@@ -496,6 +500,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Revealed
+
                         Nothing ->
                             Expect.fail "Could not get center cell"
             , test "revealCellWithFloodFill reveals connected zero region" <|
@@ -505,11 +510,17 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.revealCellWithFloodFill 0 0
-                                
+
                         allCells =
-                            [ getCell board 0 0, getCell board 0 1, getCell board 0 2
-                            , getCell board 1 0, getCell board 1 1, getCell board 1 2
-                            , getCell board 2 0, getCell board 2 1, getCell board 2 2
+                            [ getCell board 0 0
+                            , getCell board 0 1
+                            , getCell board 0 2
+                            , getCell board 1 0
+                            , getCell board 1 1
+                            , getCell board 1 2
+                            , getCell board 2 0
+                            , getCell board 2 1
+                            , getCell board 2 2
                             ]
                                 |> List.filterMap identity
                     in
@@ -525,35 +536,38 @@ suite =
                                 |> placeMineAt 0 0
                                 |> calculateAdjacentMinesForBoard 3 3
                                 |> Board.revealCellWithFloodFill 2 2
-                                
+
                         -- Cell (2,2) should be revealed (it's zero)
                         bottomRightCell =
                             getCell board 2 2
-                            
+
                         -- Cell (1,1) should be revealed (it's a number but connected to zero region)
                         centerCell =
                             getCell board 1 1
-                            
+
                         -- Cell (0,1) should be revealed (it's a number but connected to zero region)
                         topMiddleCell =
                             getCell board 0 1
-                            
+
                         -- Cell (1,0) should be revealed (it's a number but connected to zero region)
                         middleLeftCell =
                             getCell board 1 0
                     in
-                    case (bottomRightCell, centerCell) of
-                        (Just cell22, Just cell11) ->
-                            case (topMiddleCell, middleLeftCell) of
-                                (Just cell01, Just cell10) ->
+                    case ( bottomRightCell, centerCell ) of
+                        ( Just cell22, Just cell11 ) ->
+                            case ( topMiddleCell, middleLeftCell ) of
+                                ( Just cell01, Just cell10 ) ->
                                     Expect.all
                                         [ \_ -> cell22.state |> Expect.equal Revealed
                                         , \_ -> cell11.state |> Expect.equal Revealed
                                         , \_ -> cell01.state |> Expect.equal Revealed
                                         , \_ -> cell10.state |> Expect.equal Revealed
-                                        ] ()
+                                        ]
+                                        ()
+
                                 _ ->
                                     Expect.fail "Could not get expected cells"
+
                         _ ->
                             Expect.fail "Could not get expected cells"
             , test "revealCellWithFloodFill does not reveal mines" <|
@@ -568,37 +582,40 @@ suite =
                                 |> placeMineAt 2 2
                                 |> calculateAdjacentMinesForBoard 3 3
                                 |> Board.revealCellWithFloodFill 1 1
-                                
+
                         -- Center cell should be revealed (it's a number)
                         centerCell =
                             getCell board 1 1
-                            
+
                         -- Corner mines should NOT be revealed
                         topLeftMine =
                             getCell board 0 0
-                            
+
                         topRightMine =
                             getCell board 0 2
-                            
+
                         bottomLeftMine =
                             getCell board 2 0
-                            
+
                         bottomRightMine =
                             getCell board 2 2
                     in
-                    case (centerCell, topLeftMine, topRightMine) of
-                        (Just center, Just tl, Just tr) ->
-                            case (bottomLeftMine, bottomRightMine) of
-                                (Just bl, Just br) ->
+                    case ( centerCell, topLeftMine, topRightMine ) of
+                        ( Just center, Just tl, Just tr ) ->
+                            case ( bottomLeftMine, bottomRightMine ) of
+                                ( Just bl, Just br ) ->
                                     Expect.all
                                         [ \_ -> center.state |> Expect.equal Revealed
                                         , \_ -> tl.state |> Expect.equal Hidden
                                         , \_ -> tr.state |> Expect.equal Hidden
                                         , \_ -> bl.state |> Expect.equal Hidden
                                         , \_ -> br.state |> Expect.equal Hidden
-                                        ] ()
+                                        ]
+                                        ()
+
                                 _ ->
                                     Expect.fail "Could not get expected cells"
+
                         _ ->
                             Expect.fail "Could not get expected cells"
             , test "revealCellWithFloodFill handles already revealed cells" <|
@@ -609,7 +626,7 @@ suite =
                             Board.empty 3 3
                                 |> Board.revealCell 1 1
                                 |> Board.revealCellWithFloodFill 1 1
-                                
+
                         centerCell =
                             getCell board 1 1
                     in
@@ -617,6 +634,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Revealed
+
                         Nothing ->
                             Expect.fail "Could not get center cell"
             , test "revealCellWithFloodFill handles clicking on mine" <|
@@ -627,20 +645,22 @@ suite =
                             Board.empty 3 3
                                 |> placeMineAt 1 1
                                 |> Board.revealCellWithFloodFill 1 1
-                                
+
                         centerCell =
                             getCell board 1 1
-                            
+
                         -- Other cells should remain hidden
                         cornerCell =
                             getCell board 0 0
                     in
-                    case (centerCell, cornerCell) of
-                        (Just mine, Just corner) ->
+                    case ( centerCell, cornerCell ) of
+                        ( Just mine, Just corner ) ->
                             Expect.all
                                 [ \_ -> mine.state |> Expect.equal Revealed
                                 , \_ -> corner.state |> Expect.equal Hidden
-                                ] ()
+                                ]
+                                ()
+
                         _ ->
                             Expect.fail "Could not get expected cells"
             , test "revealCellWithFloodFill handles invalid position" <|
@@ -650,12 +670,18 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.revealCellWithFloodFill 5 5
-                                
+
                         -- Board should remain unchanged
                         allCells =
-                            [ getCell board 0 0, getCell board 0 1, getCell board 0 2
-                            , getCell board 1 0, getCell board 1 1, getCell board 1 2
-                            , getCell board 2 0, getCell board 2 1, getCell board 2 2
+                            [ getCell board 0 0
+                            , getCell board 0 1
+                            , getCell board 0 2
+                            , getCell board 1 0
+                            , getCell board 1 1
+                            , getCell board 1 2
+                            , getCell board 2 0
+                            , getCell board 2 1
+                            , getCell board 2 2
                             ]
                                 |> List.filterMap identity
                     in
@@ -674,37 +700,40 @@ suite =
                                 |> placeMineAt 4 4
                                 |> calculateAdjacentMinesForBoard 5 5
                                 |> Board.revealCellWithFloodFill 2 2
-                                
+
                         -- Center should be revealed (zero)
                         centerCell =
                             getCell board 2 2
-                            
+
                         -- Adjacent cells should be revealed (numbers)
                         topCell =
                             getCell board 1 2
-                            
+
                         bottomCell =
                             getCell board 3 2
-                            
+
                         leftCell =
                             getCell board 2 1
-                            
+
                         rightCell =
                             getCell board 2 3
                     in
-                    case (centerCell, topCell, bottomCell) of
-                        (Just center, Just top, Just bottom) ->
-                            case (leftCell, rightCell) of
-                                (Just left, Just right) ->
+                    case ( centerCell, topCell, bottomCell ) of
+                        ( Just center, Just top, Just bottom ) ->
+                            case ( leftCell, rightCell ) of
+                                ( Just left, Just right ) ->
                                     Expect.all
                                         [ \_ -> center.state |> Expect.equal Revealed
                                         , \_ -> top.state |> Expect.equal Revealed
                                         , \_ -> bottom.state |> Expect.equal Revealed
                                         , \_ -> left.state |> Expect.equal Revealed
                                         , \_ -> right.state |> Expect.equal Revealed
-                                        ] ()
+                                        ]
+                                        ()
+
                                 _ ->
                                     Expect.fail "Could not get expected cells"
+
                         _ ->
                             Expect.fail "Could not get expected cells"
             ]
@@ -715,7 +744,7 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.toggleFlag 1 1
-                                
+
                         flaggedCell =
                             getCell board 1 1
                     in
@@ -723,6 +752,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Flagged
+
                         Nothing ->
                             Expect.fail "Could not get cell at position (1,1)"
             , test "unflags a flagged cell" <|
@@ -732,7 +762,7 @@ suite =
                             Board.empty 3 3
                                 |> Board.toggleFlag 1 1
                                 |> Board.toggleFlag 1 1
-                                
+
                         unflaggedCell =
                             getCell board 1 1
                     in
@@ -740,6 +770,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Hidden
+
                         Nothing ->
                             Expect.fail "Could not get cell at position (1,1)"
             , test "does not affect revealed cells" <|
@@ -749,7 +780,7 @@ suite =
                             Board.empty 3 3
                                 |> Board.revealCell 1 1
                                 |> Board.toggleFlag 1 1
-                                
+
                         revealedCell =
                             getCell board 1 1
                     in
@@ -757,6 +788,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Revealed
+
                         Nothing ->
                             Expect.fail "Could not get cell at position (1,1)"
             , test "does not affect other cells" <|
@@ -765,7 +797,7 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.toggleFlag 1 1
-                                
+
                         otherCell =
                             getCell board 0 0
                     in
@@ -773,6 +805,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Hidden
+
                         Nothing ->
                             Expect.fail "Could not get cell at position (0,0)"
             , test "handles invalid positions gracefully" <|
@@ -781,7 +814,7 @@ suite =
                         board =
                             Board.empty 3 3
                                 |> Board.toggleFlag 5 5
-                                
+
                         -- Board should remain unchanged
                         centerCell =
                             getCell board 1 1
@@ -790,6 +823,7 @@ suite =
                         Just cell ->
                             cell.state
                                 |> Expect.equal Hidden
+
                         Nothing ->
                             Expect.fail "Could not get cell at position (1,1)"
             ]
@@ -840,7 +874,8 @@ getCell board row col =
         |> Maybe.andThen (List.drop col >> List.head)
 
 
-{-| Helper function to place a mine at a specific position for testing -}
+{-| Helper function to place a mine at a specific position for testing
+-}
 placeMineAt : Int -> Int -> Board -> Board
 placeMineAt targetRow targetCol board =
     List.indexedMap
@@ -850,17 +885,20 @@ placeMineAt targetRow targetCol board =
                     (\col cell ->
                         if col == targetCol then
                             { cell | isMine = True }
+
                         else
                             cell
                     )
                     cells
+
             else
                 cells
         )
         board
 
 
-{-| Helper function to calculate adjacent mines for a board (for testing) -}
+{-| Helper function to calculate adjacent mines for a board (for testing)
+-}
 calculateAdjacentMinesForBoard : Int -> Int -> Board -> Board
 calculateAdjacentMinesForBoard rows cols board =
     List.indexedMap (calculateAdjacentMinesInRowForBoard rows cols board) board
@@ -875,6 +913,7 @@ calculateAdjacentMinesInCellForBoard : Int -> Int -> Board -> Int -> Int -> Cell
 calculateAdjacentMinesInCellForBoard rows cols board row col cell =
     if cell.isMine then
         cell
+
     else
         { cell | adjacentMines = countAdjacentMinesForBoard rows cols board row col }
 
