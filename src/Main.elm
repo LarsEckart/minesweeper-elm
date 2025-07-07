@@ -2,9 +2,9 @@ module Main exposing (main)
 
 import Board
 import Browser
-import Cell exposing (Position)
 import Html exposing (Html, div, h1, text)
 import Random
+import Types exposing (Board)
 
 
 main : Program () Model Msg
@@ -18,12 +18,12 @@ main =
 
 
 type alias Model =
-    { board : Board.Board
+    { board : Board
     }
 
 
 type Msg
-    = CellClicked Position
+    = CellClicked Int Int
 
 
 init : () -> ( Model, Cmd Msg )
@@ -41,8 +41,8 @@ init _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        CellClicked position ->
-            ( model, Cmd.none )
+        CellClicked row col ->
+            ( { model | board = Board.revealCell row col model.board }, Cmd.none )
 
 
 view : Model -> Html Msg

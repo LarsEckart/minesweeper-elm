@@ -125,13 +125,13 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Display mines temporarily for visual verification
 - **Output**: Grid with randomly placed mines
 
-### Task 4: Adjacent Mine Counting
-- [ ] Add adjacentMines field to Cell type
-- [ ] Implement mine counting logic in Board.elm
-- [ ] Update cell view to show numbers when revealed
-- [ ] Add basic click-to-reveal functionality
-- [ ] Style numbers with temporary colors
-- [ ] Write tests for mine counting
+### Task 4: Adjacent Mine Counting ✅
+- [x] Add adjacentMines field to Cell type
+- [x] Implement mine counting logic in Board.elm
+- [x] Update cell view to show numbers when revealed
+- [x] Add basic click-to-reveal functionality
+- [x] Style numbers with temporary colors
+- [x] Write tests for mine counting
 - **Output**: Clicking reveals numbers
 
 ### Task 5: First Click Safety

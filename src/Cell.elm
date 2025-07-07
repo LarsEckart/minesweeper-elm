@@ -1,8 +1,9 @@
-module Cell exposing (Cell, Position, State(..), create, view)
+module Cell exposing (create, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Types exposing (Cell, CellState(..))
 
 
 type alias Position =
@@ -11,39 +12,30 @@ type alias Position =
     }
 
 
-type State
-    = Hidden
-    | Revealed
-
-
-type alias Cell =
-    { position : Position
-    , state : State
-    , isMine : Bool
-    }
-
-
 create : Int -> Int -> Cell
 create row col =
-    { position = { row = row, col = col }
-    , state = Hidden
+    { state = Hidden
     , isMine = False
+    , adjacentMines = 0
     }
 
 
-view : (Position -> msg) -> Cell -> Html msg
-view onCellClick cell =
+view : (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
+view onCellClick row col cell =
     div
         [ style "width" "30px"
         , style "height" "30px"
         , style "border" "1px solid #999"
-        , style "background-color" "#ddd"
+        , style "background-color" (getCellBackgroundColor cell)
         , style "display" "flex"
         , style "align-items" "center"
         , style "justify-content" "center"
         , style "cursor" "pointer"
         , style "user-select" "none"
-        , onClick (onCellClick cell.position)
+        , style "font-weight" "bold"
+        , style "font-size" "14px"
+        , style "color" (getNumberColor cell.adjacentMines)
+        , onClick (onCellClick row col)
         ]
         [ text (cellToString cell) ]
 
@@ -52,15 +44,65 @@ cellToString : Cell -> String
 cellToString cell =
     case cell.state of
         Hidden ->
-            if cell.isMine then
-                "💣"
-
-            else
-                ""
+            ""
 
         Revealed ->
             if cell.isMine then
                 "💣"
 
+            else if cell.adjacentMines > 0 then
+                String.fromInt cell.adjacentMines
+
             else
-                "R"
+                ""
+
+        Flagged ->
+            "🚩"
+
+
+getCellBackgroundColor : Cell -> String
+getCellBackgroundColor cell =
+    case cell.state of
+        Hidden ->
+            "#ddd"
+
+        Revealed ->
+            if cell.isMine then
+                "#ff4444"
+
+            else
+                "#eee"
+
+        Flagged ->
+            "#ddd"
+
+
+getNumberColor : Int -> String
+getNumberColor count =
+    case count of
+        1 ->
+            "#0000ff"
+
+        2 ->
+            "#008000"
+
+        3 ->
+            "#ff0000"
+
+        4 ->
+            "#000080"
+
+        5 ->
+            "#800000"
+
+        6 ->
+            "#008080"
+
+        7 ->
+            "#000000"
+
+        8 ->
+            "#808080"
+
+        _ ->
+            "#000000"

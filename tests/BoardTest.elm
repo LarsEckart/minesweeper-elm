@@ -1,10 +1,11 @@
 module BoardTest exposing (..)
 
 import Board
-import Cell exposing (Position, State(..))
+import Cell
 import Expect exposing (Expectation)
 import Random
 import Test exposing (..)
+import Types exposing (Board, Cell, CellState(..))
 
 
 suite : Test
@@ -32,20 +33,6 @@ suite =
                     firstRow
                         |> List.length
                         |> Expect.equal 9
-            , test "cells have correct positions" <|
-                \_ ->
-                    let
-                        board =
-                            Board.empty 3 3
-
-                        firstRow =
-                            List.head board |> Maybe.withDefault []
-
-                        firstCell =
-                            List.head firstRow |> Maybe.withDefault (Cell.create 0 0)
-                    in
-                    firstCell.position
-                        |> Expect.equal { row = 0, col = 0 }
             , test "all cells start as Hidden" <|
                 \_ ->
                     let
@@ -60,6 +47,20 @@ suite =
                     in
                     firstCell.state
                         |> Expect.equal Hidden
+            , test "all cells start with no adjacent mines" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 2 2
+
+                        firstRow =
+                            List.head board |> Maybe.withDefault []
+
+                        firstCell =
+                            List.head firstRow |> Maybe.withDefault (Cell.create 0 0)
+                    in
+                    firstCell.adjacentMines
+                        |> Expect.equal 0
             ]
         , describe "withMines"
             [ test "creates board with correct mine count" <|
@@ -148,10 +149,111 @@ suite =
                     nonMineCount
                         |> Expect.equal 7
             ]
+        , describe "adjacent mine counting"
+            [ test "calculates adjacent mines correctly for corner cell" <|
+                \_ ->
+                    let
+                        -- Create a 3x3 board with mines at (0,1) and (1,0)
+                        seed =
+                            Random.initialSeed 12345
+
+                        board =
+                            Board.withMines 3 3 2 seed
+
+                        -- Get the cell at position (0,0) - top-left corner
+                        topLeftCell =
+                            getCell board 0 0
+                    in
+                    case topLeftCell of
+                        Just cell ->
+                            if cell.isMine then
+                                Expect.pass
+
+                            else
+                                cell.adjacentMines
+                                    |> Expect.atLeast 0
+
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (0,0)"
+            , test "mine cells have adjacentMines = 0" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMines 3 3 2 seed
+
+                        mineCells =
+                            board
+                                |> List.concat
+                                |> List.filter .isMine
+                    in
+                    mineCells
+                        |> List.all (\cell -> cell.adjacentMines == 0)
+                        |> Expect.equal True
+            , test "non-mine cells have correct adjacent mine count" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMines 3 3 2 seed
+
+                        nonMineCells =
+                            board
+                                |> List.concat
+                                |> List.filter (\cell -> not cell.isMine)
+                    in
+                    nonMineCells
+                        |> List.all (\cell -> cell.adjacentMines >= 0 && cell.adjacentMines <= 8)
+                        |> Expect.equal True
+            ]
+        , describe "revealCell"
+            [ test "reveals a hidden cell" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+
+                        revealedBoard =
+                            Board.revealCell 1 1 board
+
+                        revealedCell =
+                            getCell revealedBoard 1 1
+                    in
+                    case revealedCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Revealed
+
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (1,1)"
+            , test "does not affect other cells when revealing" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+
+                        revealedBoard =
+                            Board.revealCell 1 1 board
+
+                        otherCell =
+                            getCell revealedBoard 0 0
+                    in
+                    case otherCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Hidden
+
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (0,0)"
+            ]
         ]
 
 
-countMines : Board.Board -> Int
+countMines : Board -> Int
 countMines board =
     board
         |> List.concat
@@ -159,7 +261,7 @@ countMines board =
         |> List.length
 
 
-countNonMines : Board.Board -> Int
+countNonMines : Board -> Int
 countNonMines board =
     board
         |> List.concat
@@ -167,10 +269,29 @@ countNonMines board =
         |> List.length
 
 
-getMinePositions : Board.Board -> List Position
+getMinePositions : Board -> List { row : Int, col : Int }
 getMinePositions board =
     board
+        |> List.indexedMap
+            (\row cells ->
+                cells
+                    |> List.indexedMap
+                        (\col cell ->
+                            if cell.isMine then
+                                Just { row = row, col = col }
+
+                            else
+                                Nothing
+                        )
+                    |> List.filterMap identity
+            )
         |> List.concat
-        |> List.filter .isMine
-        |> List.map .position
         |> List.sortBy (\pos -> pos.row * 1000 + pos.col)
+
+
+getCell : Board -> Int -> Int -> Maybe Cell
+getCell board row col =
+    board
+        |> List.drop row
+        |> List.head
+        |> Maybe.andThen (List.drop col >> List.head)

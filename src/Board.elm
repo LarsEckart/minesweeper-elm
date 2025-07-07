@@ -1,14 +1,11 @@
-module Board exposing (Board, empty, view, withMines)
+module Board exposing (empty, revealCell, view, withMines)
 
 import Array
-import Cell exposing (Cell, Position)
+import Cell
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Random
-
-
-type alias Board =
-    List (List Cell)
+import Types exposing (Board, Cell, CellState(..))
 
 
 empty : Int -> Int -> Board
@@ -21,7 +18,7 @@ empty rows cols =
             )
 
 
-view : (Position -> msg) -> Board -> Html msg
+view : (Int -> Int -> msg) -> Board -> Html msg
 view onCellClick board =
     div
         [ style "display" "grid"
@@ -31,12 +28,12 @@ view onCellClick board =
         , style "padding" "10px"
         , style "background-color" "#f0f0f0"
         ]
-        (List.concat (List.map (viewRow onCellClick) board))
+        (List.concat (List.indexedMap (viewRow onCellClick) board))
 
 
-viewRow : (Position -> msg) -> List Cell -> List (Html msg)
-viewRow onCellClick cells =
-    List.map (Cell.view onCellClick) cells
+viewRow : (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
+viewRow onCellClick row cells =
+    List.indexedMap (\col cell -> Cell.view onCellClick row col cell) cells
 
 
 withMines : Int -> Int -> Int -> Random.Seed -> Board
@@ -53,6 +50,13 @@ withMines rows cols mineCount seed =
     in
     empty rows cols
         |> placeMines minePositions
+        |> calculateAdjacentMines rows cols
+
+
+type alias Position =
+    { row : Int
+    , col : Int
+    }
 
 
 generateAllPositions : Int -> Int -> List Position
@@ -110,18 +114,88 @@ shuffleArrayHelper i array =
 
 placeMines : List Position -> Board -> Board
 placeMines minePositions board =
-    List.map (placeMinesInRow minePositions) board
+    List.indexedMap (placeMinesInRow minePositions) board
 
 
-placeMinesInRow : List Position -> List Cell -> List Cell
-placeMinesInRow minePositions cells =
-    List.map (placeMineInCell minePositions) cells
+placeMinesInRow : List Position -> Int -> List Cell -> List Cell
+placeMinesInRow minePositions row cells =
+    List.indexedMap (\col cell -> placeMineInCell minePositions row col cell) cells
 
 
-placeMineInCell : List Position -> Cell -> Cell
-placeMineInCell minePositions cell =
-    if List.any (\pos -> pos.row == cell.position.row && pos.col == cell.position.col) minePositions then
+placeMineInCell : List Position -> Int -> Int -> Cell -> Cell
+placeMineInCell minePositions row col cell =
+    if List.any (\pos -> pos.row == row && pos.col == col) minePositions then
         { cell | isMine = True }
 
     else
         cell
+
+
+calculateAdjacentMines : Int -> Int -> Board -> Board
+calculateAdjacentMines rows cols board =
+    List.indexedMap (calculateAdjacentMinesInRow rows cols board) board
+
+
+calculateAdjacentMinesInRow : Int -> Int -> Board -> Int -> List Cell -> List Cell
+calculateAdjacentMinesInRow rows cols board row cells =
+    List.indexedMap (\col cell -> calculateAdjacentMinesInCell rows cols board row col cell) cells
+
+
+calculateAdjacentMinesInCell : Int -> Int -> Board -> Int -> Int -> Cell -> Cell
+calculateAdjacentMinesInCell rows cols board row col cell =
+    if cell.isMine then
+        cell
+
+    else
+        { cell | adjacentMines = countAdjacentMines rows cols board row col }
+
+
+countAdjacentMines : Int -> Int -> Board -> Int -> Int -> Int
+countAdjacentMines rows cols board row col =
+    getAdjacentPositions rows cols row col
+        |> List.map (getCellAt board)
+        |> List.filter (Maybe.map .isMine >> Maybe.withDefault False)
+        |> List.length
+
+
+getAdjacentPositions : Int -> Int -> Int -> Int -> List Position
+getAdjacentPositions rows cols row col =
+    [ { row = row - 1, col = col - 1 }
+    , { row = row - 1, col = col }
+    , { row = row - 1, col = col + 1 }
+    , { row = row, col = col - 1 }
+    , { row = row, col = col + 1 }
+    , { row = row + 1, col = col - 1 }
+    , { row = row + 1, col = col }
+    , { row = row + 1, col = col + 1 }
+    ]
+        |> List.filter (\pos -> pos.row >= 0 && pos.row < rows && pos.col >= 0 && pos.col < cols)
+
+
+getCellAt : Board -> Position -> Maybe Cell
+getCellAt board position =
+    board
+        |> List.drop position.row
+        |> List.head
+        |> Maybe.andThen (List.drop position.col >> List.head)
+
+
+revealCell : Int -> Int -> Board -> Board
+revealCell row col board =
+    List.indexedMap
+        (\r cells ->
+            if r == row then
+                List.indexedMap
+                    (\c cell ->
+                        if c == col then
+                            { cell | state = Revealed }
+
+                        else
+                            cell
+                    )
+                    cells
+
+            else
+                cells
+        )
+        board
