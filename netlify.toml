@@ -1,6 +1,0 @@
-[build]
-  command = "npm install && ./build_project.sh"
-  publish = "dist"
-
-[build.environment]
-  NODE_VERSION = "18"
