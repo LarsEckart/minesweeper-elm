@@ -3,15 +3,13 @@
 ## Project Overview
 A modern Minesweeper game built with Elm 0.19
 
-## Development Commands
+## Development
 
-### Build & Development
 ```bash
 # Build the project
 ./build_project.sh
 ```
 
-### Verify tests, formatting and linting
 ```bash
 # Verify tests, formatting and linting
 ./scripts/check.sh
@@ -25,4 +23,4 @@ A modern Minesweeper game built with Elm 0.19
 4. Use Playwright MCP to verify the game also from user's perspective
 5. Commit your changes with a descriptive message
 5. Push your branch to GitHub
-7. Create a pull request and wait for review
+7. Create a pull request, mention which issue it closes and wait for review
