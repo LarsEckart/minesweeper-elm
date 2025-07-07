@@ -182,12 +182,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for timer logic
 - **Output**: Working game timer
 
-### Task 11: Reset Button
-- [ ] Add reset button with smiley emoji
-- [ ] Implement emoji state changes (idle, pressed, win, loss)
-- [ ] Generate new random board on reset
-- [ ] Reset timer and mine counter
-- [ ] Write tests for reset functionality
+### Task 11: Reset Button ✅
+- [x] Add reset button with smiley emoji
+- [x] Implement emoji state changes (idle, pressed, win, loss)
+- [x] Generate new random board on reset
+- [x] Reset timer and mine counter
+- [x] Write tests for reset functionality
 - **Output**: Functional reset button
 
 ### Task 12: Header Bar Layout

@@ -53,4 +53,5 @@ type Msg
     | TouchEndWithTime Int Int Time.Posix
     | NewGame Difficulty
     | TimerTick Time.Posix
+    | ResetGame
     | NoOp

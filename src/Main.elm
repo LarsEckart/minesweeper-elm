@@ -1,9 +1,10 @@
-module Main exposing (main)
+module Main exposing (main, update)
 
 import Board
 import Browser
-import Html exposing (Html, div, h1, text)
+import Html exposing (Html, button, div, h1, text)
 import Html.Attributes
+import Html.Events
 import Random
 import Task
 import Time
@@ -74,6 +75,24 @@ update msg model =
         NewGame difficulty ->
             -- TODO: Implement new game functionality
             ( model, Cmd.none )
+
+        ResetGame ->
+            let
+                seed =
+                    Random.initialSeed 42
+
+                newBoard =
+                    Board.withMines 9 9 10 seed
+            in
+            ( { model
+                | board = newBoard
+                , gameState = Playing
+                , isFirstClick = True
+                , mineCount = 10
+                , timer = Timer.init
+              }
+            , Cmd.none
+            )
 
         TimerTick _ ->
             ( { model | timer = Timer.tick model.timer }, Cmd.none )
@@ -322,6 +341,7 @@ view model =
         [ h1 [] [ text "Minesweeper" ]
         , gameStatusView model.gameState
         , mineCounterView model.mineCount
+        , resetButtonView model.gameState
         , timerView model.timer
         , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
         ]
@@ -331,6 +351,34 @@ mineCounterView : Int -> Html Msg
 mineCounterView mineCount =
     div [ Html.Attributes.style "font-size" "16px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
         [ text ("💣 " ++ String.fromInt mineCount) ]
+
+
+resetButtonView : GameState -> Html Msg
+resetButtonView gameState =
+    let
+        emoji =
+            case gameState of
+                Playing ->
+                    "🙂"
+
+                Won ->
+                    "😎"
+
+                Lost ->
+                    "😵"
+    in
+    div [ Html.Attributes.style "text-align" "center", Html.Attributes.style "margin" "10px 0" ]
+        [ button
+            [ Html.Events.onClick ResetGame
+            , Html.Attributes.style "font-size" "24px"
+            , Html.Attributes.style "padding" "8px 12px"
+            , Html.Attributes.style "border" "2px solid #ccc"
+            , Html.Attributes.style "border-radius" "6px"
+            , Html.Attributes.style "background-color" "#f0f0f0"
+            , Html.Attributes.style "cursor" "pointer"
+            ]
+            [ text emoji ]
+        ]
 
 
 timerView : Timer.Timer -> Html Msg
