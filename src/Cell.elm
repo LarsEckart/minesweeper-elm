@@ -20,6 +20,7 @@ type alias Cell =
     { position : Position
     , state : State
     , isMine : Bool
+    , adjacentMines : Int
     }
 
 
@@ -28,6 +29,7 @@ create row col =
     { position = { row = row, col = col }
     , state = Hidden
     , isMine = False
+    , adjacentMines = 0
     }
 
 
@@ -37,19 +39,21 @@ view onCellClick cell =
         [ style "width" "30px"
         , style "height" "30px"
         , style "border" "1px solid #999"
-        , style "background-color" "#ddd"
+        , style "background-color" (cellBackgroundColor cell)
         , style "display" "flex"
         , style "align-items" "center"
         , style "justify-content" "center"
         , style "cursor" "pointer"
         , style "user-select" "none"
+        , style "font-weight" "bold"
+        , style "color" (numberColor cell)
         , onClick (onCellClick cell.position)
         ]
-        [ text (cellToString cell) ]
+        [ text (cellContent cell) ]
 
 
-cellToString : Cell -> String
-cellToString cell =
+cellContent : Cell -> String
+cellContent cell =
     case cell.state of
         Hidden ->
             if cell.isMine then
@@ -62,5 +66,62 @@ cellToString cell =
             if cell.isMine then
                 "💣"
 
+            else if cell.adjacentMines > 0 then
+                String.fromInt cell.adjacentMines
+
             else
-                "R"
+                ""
+
+
+cellBackgroundColor : Cell -> String
+cellBackgroundColor cell =
+    case cell.state of
+        Hidden ->
+            "#ddd"
+
+        Revealed ->
+            if cell.isMine then
+                "#ff6b6b"
+
+            else
+                "#eee"
+
+
+numberColor : Cell -> String
+numberColor cell =
+    case cell.state of
+        Hidden ->
+            "#000"
+
+        Revealed ->
+            if cell.isMine then
+                "#fff"
+
+            else
+                case cell.adjacentMines of
+                    1 ->
+                        "#0000ff"
+
+                    2 ->
+                        "#008000"
+
+                    3 ->
+                        "#ff0000"
+
+                    4 ->
+                        "#000080"
+
+                    5 ->
+                        "#800000"
+
+                    6 ->
+                        "#008080"
+
+                    7 ->
+                        "#000000"
+
+                    8 ->
+                        "#808080"
+
+                    _ ->
+                        "#000"

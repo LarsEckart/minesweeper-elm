@@ -147,6 +147,68 @@ suite =
                     in
                     nonMineCount
                         |> Expect.equal 7
+            , test "adjacent mine counting works correctly" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMines 3 3 2 seed
+
+                        -- Check that adjacentMines field is calculated
+                        allCells =
+                            List.concat board
+
+                        cellsWithAdjacentMines =
+                            List.filter (\cell -> cell.adjacentMines > 0) allCells
+                    in
+                    List.length cellsWithAdjacentMines
+                        |> Expect.atLeast 1
+            ]
+        , describe "revealCell"
+            [ test "reveals a hidden cell" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMines 3 3 1 seed
+
+                        revealedBoard =
+                            Board.revealCell { row = 1, col = 1 } board
+
+                        -- Get the cell at position (1, 1)
+                        secondRow =
+                            List.drop 1 revealedBoard |> List.head |> Maybe.withDefault []
+
+                        middleCell =
+                            List.drop 1 secondRow |> List.head |> Maybe.withDefault (Cell.create 1 1)
+                    in
+                    middleCell.state
+                        |> Expect.equal Revealed
+            , test "does not affect other cells when revealing" <|
+                \_ ->
+                    let
+                        seed =
+                            Random.initialSeed 42
+
+                        board =
+                            Board.withMines 3 3 1 seed
+
+                        revealedBoard =
+                            Board.revealCell { row = 1, col = 1 } board
+
+                        -- Get the cell at position (0, 0) - should still be hidden
+                        firstRow =
+                            List.head revealedBoard |> Maybe.withDefault []
+
+                        firstCell =
+                            List.head firstRow |> Maybe.withDefault (Cell.create 0 0)
+                    in
+                    firstCell.state
+                        |> Expect.equal Hidden
             ]
         ]
 

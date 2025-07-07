@@ -42,7 +42,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         CellClicked position ->
-            ( model, Cmd.none )
+            ( { model | board = Board.revealCell position model.board }, Cmd.none )
 
 
 view : Model -> Html Msg

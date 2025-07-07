@@ -1,7 +1,13 @@
+<<<<<<< HEAD
 module Board exposing (Board, empty, view, withMines)
 
 import Array
 import Cell exposing (Cell, Position)
+=======
+module Board exposing (Board, empty, revealCell, view, withMines)
+
+import Cell exposing (Cell, Position, State(..))
+>>>>>>> 681b99e (TASK-4 Implement Task 4: Adjacent Mine Counting)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Random
@@ -39,6 +45,7 @@ viewRow onCellClick cells =
     List.map (Cell.view onCellClick) cells
 
 
+<<<<<<< HEAD
 withMines : Int -> Int -> Int -> Random.Seed -> Board
 withMines rows cols mineCount seed =
     let
@@ -122,6 +129,73 @@ placeMineInCell : List Position -> Cell -> Cell
 placeMineInCell minePositions cell =
     if List.any (\pos -> pos.row == cell.position.row && pos.col == cell.position.col) minePositions then
         { cell | isMine = True }
+=======
+withMines : List Position -> Board -> Board
+withMines minePositions board =
+    board
+        |> List.map (List.map (placeMine minePositions))
+        |> calculateAdjacentMines
+
+
+placeMine : List Position -> Cell -> Cell
+placeMine minePositions cell =
+    { cell | isMine = List.member cell.position minePositions }
+
+
+calculateAdjacentMines : Board -> Board
+calculateAdjacentMines board =
+    List.map (List.map (calculateCellAdjacentMines board)) board
+
+
+calculateCellAdjacentMines : Board -> Cell -> Cell
+calculateCellAdjacentMines board cell =
+    { cell | adjacentMines = countAdjacentMines board cell.position }
+
+
+countAdjacentMines : Board -> Position -> Int
+countAdjacentMines board position =
+    getAdjacentPositions position
+        |> List.map (getCellAt board)
+        |> List.filterMap identity
+        |> List.filter .isMine
+        |> List.length
+
+
+getAdjacentPositions : Position -> List Position
+getAdjacentPositions pos =
+    [ { row = pos.row - 1, col = pos.col - 1 }
+    , { row = pos.row - 1, col = pos.col }
+    , { row = pos.row - 1, col = pos.col + 1 }
+    , { row = pos.row, col = pos.col - 1 }
+    , { row = pos.row, col = pos.col + 1 }
+    , { row = pos.row + 1, col = pos.col - 1 }
+    , { row = pos.row + 1, col = pos.col }
+    , { row = pos.row + 1, col = pos.col + 1 }
+    ]
+
+
+getCellAt : Board -> Position -> Maybe Cell
+getCellAt board position =
+    if position.row < 0 || position.col < 0 then
+        Nothing
+
+    else
+        board
+            |> List.drop position.row
+            |> List.head
+            |> Maybe.andThen (List.drop position.col >> List.head)
+
+
+revealCell : Position -> Board -> Board
+revealCell position board =
+    List.map (List.map (revealCellIfMatch position)) board
+
+
+revealCellIfMatch : Position -> Cell -> Cell
+revealCellIfMatch targetPosition cell =
+    if cell.position == targetPosition then
+        { cell | state = Revealed }
+>>>>>>> 681b99e (TASK-4 Implement Task 4: Adjacent Mine Counting)
 
     else
         cell
