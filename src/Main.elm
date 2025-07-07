@@ -1,7 +1,9 @@
 module Main exposing (main)
 
+import Board
 import Browser
-import Html exposing (Html, h1, text)
+import Cell exposing (Position)
+import Html exposing (Html, div, h1, text)
 
 
 main : Program () Model Msg
@@ -15,25 +17,29 @@ main =
 
 
 type alias Model =
-    {}
+    { board : Board.Board
+    }
 
 
 type Msg
-    = NoOp
+    = CellClicked Position
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( {}, Cmd.none )
+    ( { board = Board.empty 9 9 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NoOp ->
+        CellClicked position ->
             ( model, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    h1 [] [ text "Minesweeper" ]
+    div []
+        [ h1 [] [ text "Minesweeper" ]
+        , Board.view CellClicked model.board
+        ]
