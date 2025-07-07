@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper</title>
+  <style>
+    body { 
+      padding: 0; 
+      margin: 0; 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Responsive container */
+    #elm {
+      max-width: 100vw;
+      max-height: 100vh;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      #elm {
+        padding: 5px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #elm {
+        padding: 2px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="elm"></div>
+  <script src="main.js"></script>
+  <script>
+    var app = Elm.Main.init({
+      node: document.getElementById('elm')
+    });
+  </script>
+</body>
+</html>
