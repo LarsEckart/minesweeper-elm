@@ -1,4 +1,4 @@
-module Board exposing (empty, revealCell, view, withMines, withMinesAvoidingPosition)
+module Board exposing (empty, isLoss, isWin, revealAllMines, revealCell, view, withMines, withMinesAvoidingPosition)
 
 import Array
 import Cell
@@ -218,5 +218,43 @@ revealCell row col board =
 
             else
                 cells
+        )
+        board
+
+
+{-| Check if the game is lost by determining if a mine was revealed
+-}
+isLoss : Board -> Bool
+isLoss board =
+    board
+        |> List.concat
+        |> List.any (\cell -> cell.isMine && cell.state == Revealed)
+
+
+{-| Check if the game is won by determining if all non-mine cells are revealed
+-}
+isWin : Board -> Bool
+isWin board =
+    board
+        |> List.concat
+        |> List.filter (\cell -> not cell.isMine)
+        |> List.all (\cell -> cell.state == Revealed)
+
+
+{-| Reveal all mines on the board (used when game is lost)
+-}
+revealAllMines : Board -> Board
+revealAllMines board =
+    List.map
+        (\row ->
+            List.map
+                (\cell ->
+                    if cell.isMine then
+                        { cell | state = Revealed }
+
+                    else
+                        cell
+                )
+                row
         )
         board

@@ -134,20 +134,20 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for mine counting
 - **Output**: Clicking reveals numbers
 
-### Task 5: First Click Safety
-- [ ] Implement first click detection in Model
-- [ ] Add logic to regenerate board if first click hits mine
-- [ ] Ensure first click always reveals a zero cell
-- [ ] Write tests for first click safety
+### Task 5: First Click Safety ✅
+- [x] Implement first click detection in Model
+- [x] Add logic to regenerate board if first click hits mine
+- [x] Ensure first click always reveals a zero cell
+- [x] Write tests for first click safety
 - **Output**: Safe first click guaranteed
 
-### Task 6: Basic Win/Loss Detection
-- [ ] Add GameState type (Playing, Won, Lost)
-- [ ] Implement loss detection when clicking mine
-- [ ] Implement win detection (all non-mines revealed)
-- [ ] Show all mines on loss
-- [ ] Disable further clicks after game ends
-- [ ] Write tests for win/loss conditions
+### Task 6: Basic Win/Loss Detection ✅
+- [x] Add GameState type (Playing, Won, Lost)
+- [x] Implement loss detection when clicking mine
+- [x] Implement win detection (all non-mines revealed)
+- [x] Show all mines on loss
+- [x] Disable further clicks after game ends
+- [x] Write tests for win/loss conditions
 - **Output**: Playable game with end states
 
 ### Task 7: Flood Fill Algorithm

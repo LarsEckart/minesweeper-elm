@@ -352,6 +352,134 @@ suite =
                     mines1
                         |> Expect.notEqual mines2
             ]
+        , describe "win/loss detection"
+            [ test "isLoss returns True when a mine is revealed" <|
+                \_ ->
+                    let
+                        -- Create a small board with a mine at (0,0)
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> Board.revealCell 0 0
+                    in
+                    Board.isLoss board
+                        |> Expect.equal True
+            , test "isLoss returns False when no mines are revealed" <|
+                \_ ->
+                    let
+                        -- Create a small board with a mine at (0,0) but don't reveal it
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> Board.revealCell 0 1
+                    in
+                    Board.isLoss board
+                        |> Expect.equal False
+            , test "isLoss returns False on empty board" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 2 2
+                    in
+                    Board.isLoss board
+                        |> Expect.equal False
+            , test "isWin returns True when all non-mine cells are revealed" <|
+                \_ ->
+                    let
+                        -- Create a 2x2 board with one mine at (0,0)
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> Board.revealCell 0 1
+                                |> Board.revealCell 1 0
+                                |> Board.revealCell 1 1
+                    in
+                    Board.isWin board
+                        |> Expect.equal True
+            , test "isWin returns False when some non-mine cells are hidden" <|
+                \_ ->
+                    let
+                        -- Create a 2x2 board with one mine at (0,0), reveal only one non-mine cell
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> Board.revealCell 0 1
+                    in
+                    Board.isWin board
+                        |> Expect.equal False
+            , test "isWin returns False on empty board with no revealed cells" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 2 2
+                    in
+                    Board.isWin board
+                        |> Expect.equal False
+            , test "isWin returns True on board with no mines when all cells revealed" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 2 2
+                                |> Board.revealCell 0 0
+                                |> Board.revealCell 0 1
+                                |> Board.revealCell 1 0
+                                |> Board.revealCell 1 1
+                    in
+                    Board.isWin board
+                        |> Expect.equal True
+            , test "revealAllMines reveals all mines on the board" <|
+                \_ ->
+                    let
+                        -- Create a 2x2 board with mines at (0,0) and (1,1)
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> placeMineAt 1 1
+                                |> Board.revealAllMines
+                                
+                        mineAt00 =
+                            getCell board 0 0
+                            
+                        mineAt11 =
+                            getCell board 1 1
+                            
+                        nonMineAt01 =
+                            getCell board 0 1
+                    in
+                    case (mineAt00, mineAt11, nonMineAt01) of
+                        (Just cell00, Just cell11, Just cell01) ->
+                            Expect.all
+                                [ \_ -> cell00.state |> Expect.equal Revealed
+                                , \_ -> cell11.state |> Expect.equal Revealed
+                                , \_ -> cell01.state |> Expect.equal Hidden
+                                ] ()
+                        _ ->
+                            Expect.fail "Could not get cells from board"
+            , test "revealAllMines does not affect non-mine cells" <|
+                \_ ->
+                    let
+                        -- Create a 2x2 board with one mine at (0,0), reveal a non-mine cell
+                        board =
+                            Board.empty 2 2
+                                |> placeMineAt 0 0
+                                |> Board.revealCell 0 1
+                                |> Board.revealAllMines
+                                
+                        revealedNonMine =
+                            getCell board 0 1
+                            
+                        hiddenNonMine =
+                            getCell board 1 0
+                    in
+                    case (revealedNonMine, hiddenNonMine) of
+                        (Just cell01, Just cell10) ->
+                            Expect.all
+                                [ \_ -> cell01.state |> Expect.equal Revealed
+                                , \_ -> cell10.state |> Expect.equal Hidden
+                                ] ()
+                        _ ->
+                            Expect.fail "Could not get cells from board"
+            ]
         ]
 
 
@@ -397,3 +525,23 @@ getCell board row col =
         |> List.drop row
         |> List.head
         |> Maybe.andThen (List.drop col >> List.head)
+
+
+{-| Helper function to place a mine at a specific position for testing -}
+placeMineAt : Int -> Int -> Board -> Board
+placeMineAt targetRow targetCol board =
+    List.indexedMap
+        (\row cells ->
+            if row == targetRow then
+                List.indexedMap
+                    (\col cell ->
+                        if col == targetCol then
+                            { cell | isMine = True }
+                        else
+                            cell
+                    )
+                    cells
+            else
+                cells
+        )
+        board
