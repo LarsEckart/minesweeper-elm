@@ -6,6 +6,7 @@ import Html exposing (Html, button, div, h1, text)
 import Html.Attributes
 import Html.Events
 import Random
+import Style
 import Task
 import Time
 import Timer
@@ -337,8 +338,19 @@ getCellAt board row col =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text "Minesweeper" ]
+    div
+        [ Html.Attributes.style "background-color" Style.colors.background
+        , Html.Attributes.style "min-height" "100vh"
+        , Html.Attributes.style "padding" "20px"
+        , Html.Attributes.style "font-family" "Arial, sans-serif"
+        ]
+        [ h1
+            [ Html.Attributes.style "text-align" "center"
+            , Html.Attributes.style "color" Style.colors.text
+            , Html.Attributes.style "margin-bottom" "20px"
+            , Html.Attributes.style "text-shadow" "2px 2px 4px rgba(0,0,0,0.3)"
+            ]
+            [ text "Minesweeper" ]
         , gameStatusView model.gameState
         , headerBarView model
         , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
@@ -351,11 +363,13 @@ headerBarView model =
         [ Html.Attributes.style "display" "flex"
         , Html.Attributes.style "justify-content" "space-between"
         , Html.Attributes.style "align-items" "center"
-        , Html.Attributes.style "padding" "10px 20px"
-        , Html.Attributes.style "border" "2px solid #ccc"
-        , Html.Attributes.style "border-radius" "8px"
-        , Html.Attributes.style "background-color" "#f8f8f8"
-        , Html.Attributes.style "margin" "10px 0"
+        , Html.Attributes.style "padding" "15px 25px"
+        , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+        , Html.Attributes.style "border-radius" "12px"
+        , Html.Attributes.style "background-color" Style.colors.primary
+        , Html.Attributes.style "margin" "20px auto"
+        , Html.Attributes.style "max-width" "400px"
+        , Html.Attributes.style "box-shadow" ("0 4px 8px " ++ Style.colors.shadow)
         ]
         [ headerMineCounterView model.mineCount
         , headerResetButtonView model.gameState
@@ -366,9 +380,13 @@ headerBarView model =
 headerMineCounterView : Int -> Html Msg
 headerMineCounterView mineCount =
     div
-        [ Html.Attributes.style "font-size" "16px"
+        [ Html.Attributes.style "font-size" "18px"
         , Html.Attributes.style "font-weight" "bold"
-        , Html.Attributes.style "color" "#333"
+        , Html.Attributes.style "color" Style.colors.text
+        , Html.Attributes.style "background-color" Style.colors.cellRevealed
+        , Html.Attributes.style "padding" "8px 12px"
+        , Html.Attributes.style "border-radius" "6px"
+        , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
         ]
         [ text ("💣 " ++ String.fromInt mineCount) ]
 
@@ -389,12 +407,14 @@ headerResetButtonView gameState =
     in
     button
         [ Html.Events.onClick ResetGame
-        , Html.Attributes.style "font-size" "24px"
-        , Html.Attributes.style "padding" "8px 12px"
-        , Html.Attributes.style "border" "2px solid #ccc"
-        , Html.Attributes.style "border-radius" "6px"
-        , Html.Attributes.style "background-color" "#f0f0f0"
+        , Html.Attributes.style "font-size" "28px"
+        , Html.Attributes.style "padding" "10px 14px"
+        , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+        , Html.Attributes.style "border-radius" "8px"
+        , Html.Attributes.style "background-color" Style.colors.secondary
         , Html.Attributes.style "cursor" "pointer"
+        , Html.Attributes.style "box-shadow" ("0 2px 4px " ++ Style.colors.shadow)
+        , Html.Attributes.style "transition" "all 0.2s ease"
         ]
         [ text emoji ]
 
@@ -409,9 +429,13 @@ headerTimerView timer =
             Timer.formatTime seconds
     in
     div
-        [ Html.Attributes.style "font-size" "16px"
+        [ Html.Attributes.style "font-size" "18px"
         , Html.Attributes.style "font-weight" "bold"
-        , Html.Attributes.style "color" "#333"
+        , Html.Attributes.style "color" Style.colors.text
+        , Html.Attributes.style "background-color" Style.colors.cellRevealed
+        , Html.Attributes.style "padding" "8px 12px"
+        , Html.Attributes.style "border-radius" "6px"
+        , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
         ]
         [ text ("⏱️ " ++ timeText) ]
 
@@ -467,13 +491,44 @@ gameStatusView : GameState -> Html Msg
 gameStatusView gameState =
     case gameState of
         Playing ->
-            div [ Html.Attributes.style "color" "blue", Html.Attributes.style "font-size" "18px", Html.Attributes.style "margin" "10px 0" ]
+            div
+                [ Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "font-size" "20px"
+                , Html.Attributes.style "margin" "15px 0"
+                , Html.Attributes.style "text-align" "center"
+                , Html.Attributes.style "background-color" Style.colors.accent
+                , Html.Attributes.style "padding" "10px"
+                , Html.Attributes.style "border-radius" "8px"
+                , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+                ]
                 [ text "Playing..." ]
 
         Won ->
-            div [ Html.Attributes.style "color" "green", Html.Attributes.style "font-size" "18px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
-                [ text "Congratulations! You won!" ]
+            div
+                [ Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "font-size" "22px"
+                , Html.Attributes.style "margin" "15px 0"
+                , Html.Attributes.style "font-weight" "bold"
+                , Html.Attributes.style "text-align" "center"
+                , Html.Attributes.style "background-color" Style.colors.accent
+                , Html.Attributes.style "padding" "15px"
+                , Html.Attributes.style "border-radius" "8px"
+                , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+                , Html.Attributes.style "box-shadow" ("0 4px 8px " ++ Style.colors.shadow)
+                ]
+                [ text "🎉 Congratulations! You won! 🎉" ]
 
         Lost ->
-            div [ Html.Attributes.style "color" "red", Html.Attributes.style "font-size" "18px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
-                [ text "Game Over! You hit a mine!" ]
+            div
+                [ Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "font-size" "22px"
+                , Html.Attributes.style "margin" "15px 0"
+                , Html.Attributes.style "font-weight" "bold"
+                , Html.Attributes.style "text-align" "center"
+                , Html.Attributes.style "background-color" Style.colors.cellMine
+                , Html.Attributes.style "padding" "15px"
+                , Html.Attributes.style "border-radius" "8px"
+                , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+                , Html.Attributes.style "box-shadow" ("0 4px 8px " ++ Style.colors.shadow)
+                ]
+                [ text "💥 Game Over! You hit a mine! 💥" ]

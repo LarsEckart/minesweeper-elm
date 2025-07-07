@@ -5,6 +5,7 @@ import Cell
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Random
+import Style
 import Time
 import Types exposing (Board, Cell, CellState(..))
 
@@ -22,12 +23,17 @@ empty rows cols =
 view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Board -> Html msg
 view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd board =
     div
-        [ style "display" "grid"
-        , style "grid-template-columns" "repeat(9, 30px)"
-        , style "gap" "1px"
-        , style "border" "1px solid #ccc"
-        , style "padding" "10px"
-        , style "background-color" "#f0f0f0"
+        [ Html.Attributes.class "grid"
+        , style "display" "grid"
+        , style "grid-template-columns" ("repeat(9, " ++ String.fromInt Style.cellSize ++ "px)")
+        , style "gap" (String.fromInt Style.gridGap ++ "px")
+        , style "border" ("3px solid " ++ Style.colors.border)
+        , style "padding" "20px"
+        , style "background-color" Style.colors.secondary
+        , style "border-radius" "12px"
+        , style "box-shadow" ("0 6px 12px " ++ Style.colors.shadow)
+        , style "margin" "20px auto"
+        , style "max-width" "fit-content"
         ]
         (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd) board))
 

@@ -4,6 +4,7 @@ import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
 import Html.Events exposing (on, onClick, preventDefaultOn)
 import Json.Decode as Decode
+import Style
 import Time
 import Types exposing (Cell, CellState(..))
 
@@ -25,9 +26,10 @@ create row col =
 view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
 view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell =
     div
-        [ style "width" "30px"
-        , style "height" "30px"
-        , style "border" "1px solid #999"
+        [ Html.Attributes.class "cell"
+        , style "width" (String.fromInt Style.cellSize ++ "px")
+        , style "height" (String.fromInt Style.cellSize ++ "px")
+        , style "border" ("2px solid " ++ Style.colors.border)
         , style "background-color" (getCellBackgroundColor cell)
         , style "display" "flex"
         , style "align-items" "center"
@@ -35,8 +37,11 @@ view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell =
         , style "cursor" "pointer"
         , style "user-select" "none"
         , style "font-weight" "bold"
-        , style "font-size" "14px"
-        , style "color" (getNumberColor cell.adjacentMines)
+        , style "font-size" "16px"
+        , style "color" (Style.numberColors cell.adjacentMines)
+        , style "border-radius" "4px"
+        , style "box-shadow" ("0 2px 4px " ++ Style.colors.shadow)
+        , style "transition" "all 0.2s ease"
         , onClick (onCellClick row col)
         , preventDefaultOn "contextmenu" (Decode.succeed ( onCellRightClick row col, True ))
         , on "touchstart" (Decode.succeed (onCellTouchStart row col))
@@ -69,45 +74,19 @@ getCellBackgroundColor : Cell -> String
 getCellBackgroundColor cell =
     case cell.state of
         Hidden ->
-            "#ddd"
+            Style.colors.cellHidden
 
         Revealed ->
             if cell.isMine then
-                "#ff4444"
+                Style.colors.cellMine
 
             else
-                "#eee"
+                Style.colors.cellRevealed
 
         Flagged ->
-            "#ddd"
+            Style.colors.cellFlag
 
 
 getNumberColor : Int -> String
 getNumberColor count =
-    case count of
-        1 ->
-            "#0000ff"
-
-        2 ->
-            "#008000"
-
-        3 ->
-            "#ff0000"
-
-        4 ->
-            "#000080"
-
-        5 ->
-            "#800000"
-
-        6 ->
-            "#008080"
-
-        7 ->
-            "#000000"
-
-        8 ->
-            "#808080"
-
-        _ ->
-            "#000000"
+    Style.numberColors count
