@@ -20,27 +20,48 @@ empty rows cols =
             )
 
 
-view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Board -> Html msg
-view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd board =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Board -> Html msg
+view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd viewportWidth board =
+    let
+        cellSize =
+            Style.responsiveCellSize viewportWidth 9
+
+        gridGap =
+            Style.responsiveGridGap viewportWidth
+
+        borderWidth =
+            if viewportWidth < 480 then
+                2
+
+            else
+                3
+
+        padding =
+            if viewportWidth < 480 then
+                10
+
+            else
+                20
+    in
     div
         [ Html.Attributes.class "grid"
         , style "display" "grid"
-        , style "grid-template-columns" ("repeat(9, " ++ String.fromInt Style.cellSize ++ "px)")
-        , style "gap" (String.fromInt Style.gridGap ++ "px")
-        , style "border" ("3px solid " ++ Style.colors.border)
-        , style "padding" "20px"
+        , style "grid-template-columns" ("repeat(9, " ++ String.fromInt cellSize ++ "px)")
+        , style "gap" (String.fromInt gridGap ++ "px")
+        , style "border" (String.fromInt borderWidth ++ "px solid " ++ Style.colors.border)
+        , style "padding" (String.fromInt padding ++ "px")
         , style "background-color" Style.colors.secondary
         , style "border-radius" "12px"
         , style "box-shadow" ("0 6px 12px " ++ Style.colors.shadow)
         , style "margin" "20px auto"
         , style "max-width" "fit-content"
         ]
-        (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd) board))
+        (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd cellSize) board))
 
 
-viewRow : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
-viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row cells =
-    List.indexedMap (\col cell -> Cell.view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell) cells
+viewRow : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> List Cell -> List (Html msg)
+viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd cellSize row cells =
+    List.indexedMap (\col cell -> Cell.view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd cellSize row col cell) cells
 
 
 withMines : Int -> Int -> Int -> Random.Seed -> Board

@@ -29,6 +29,7 @@ type alias Model =
     , mineCount : Int
     , touchStart : Maybe { row : Int, col : Int, time : Time.Posix }
     , timer : Timer.Timer
+    , viewportWidth : Int
     }
 
 
@@ -54,4 +55,5 @@ type Msg
     | NewGame Difficulty
     | TimerTick Time.Posix
     | ResetGame
+    | ViewportResize Int
     | NoOp

@@ -2,9 +2,11 @@ module Main exposing (main, update)
 
 import Board
 import Browser
+import Browser.Events
 import Html exposing (Html, button, div, h1, text)
 import Html.Attributes
 import Html.Events
+import Json.Decode as Decode
 import Random
 import Style
 import Task
@@ -39,8 +41,9 @@ init _ =
       , mineCount = 10
       , touchStart = Nothing
       , timer = Timer.init
+      , viewportWidth = 800
       }
-    , Cmd.none
+    , Task.perform ViewportResize (Task.succeed 800)
     )
 
 
@@ -97,6 +100,9 @@ update msg model =
 
         TimerTick _ ->
             ( { model | timer = Timer.tick model.timer }, Cmd.none )
+
+        ViewportResize width ->
+            ( { model | viewportWidth = width }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -320,12 +326,19 @@ handleTouchEnd row col endTime model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    case model.gameState of
-        Playing ->
-            Time.every 1000 TimerTick
+    let
+        timerSub =
+            case model.gameState of
+                Playing ->
+                    Time.every 1000 TimerTick
 
-        _ ->
-            Sub.none
+                _ ->
+                    Sub.none
+
+        viewportSub =
+            Browser.Events.onResize (\w _ -> ViewportResize w)
+    in
+    Sub.batch [ timerSub, viewportSub ]
 
 
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell
@@ -338,11 +351,23 @@ getCellAt board row col =
 
 view : Model -> Html Msg
 view model =
+    let
+        padding =
+            if model.viewportWidth < 480 then
+                "5px"
+
+            else if model.viewportWidth < 768 then
+                "10px"
+
+            else
+                "20px"
+    in
     div
         [ Html.Attributes.style "background-color" Style.colors.background
         , Html.Attributes.style "min-height" "100vh"
-        , Html.Attributes.style "padding" "20px"
+        , Html.Attributes.style "padding" padding
         , Html.Attributes.style "font-family" "Arial, sans-serif"
+        , Html.Attributes.style "overflow-x" "auto"
         ]
         [ h1
             [ Html.Attributes.style "text-align" "center"
@@ -353,18 +378,33 @@ view model =
             [ text "Minesweeper" ]
         , gameStatusView model.gameState
         , headerBarView model
-        , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
+        , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.viewportWidth model.board
         ]
 
 
 headerBarView : Model -> Html Msg
 headerBarView model =
+    let
+        padding =
+            if model.viewportWidth < 480 then
+                "10px 15px"
+
+            else
+                "15px 25px"
+
+        borderWidth =
+            if model.viewportWidth < 480 then
+                "2px"
+
+            else
+                "3px"
+    in
     div
         [ Html.Attributes.style "display" "flex"
         , Html.Attributes.style "justify-content" "space-between"
         , Html.Attributes.style "align-items" "center"
-        , Html.Attributes.style "padding" "15px 25px"
-        , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+        , Html.Attributes.style "padding" padding
+        , Html.Attributes.style "border" (borderWidth ++ " solid " ++ Style.colors.border)
         , Html.Attributes.style "border-radius" "12px"
         , Html.Attributes.style "background-color" Style.colors.primary
         , Html.Attributes.style "margin" "20px auto"

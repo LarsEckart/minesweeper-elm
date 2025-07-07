@@ -5,6 +5,8 @@ module Style exposing
     , gridGap
     , headerHeight
     , numberColors
+    , responsiveCellSize
+    , responsiveGridGap
     )
 
 
@@ -89,3 +91,29 @@ numberColors adjacentMines =
 
         _ ->
             colors.text
+
+
+responsiveCellSize : Int -> Int -> Int
+responsiveCellSize viewportWidth gridColumns =
+    let
+        availableWidth =
+            viewportWidth - 40
+
+        -- padding on sides
+        maxCellSize =
+            availableWidth // gridColumns - gridGap
+    in
+    min cellSize (max 20 maxCellSize)
+
+
+
+-- min 20px, max 30px
+
+
+responsiveGridGap : Int -> Int
+responsiveGridGap viewportWidth =
+    if viewportWidth < 480 then
+        1
+
+    else
+        gridGap

@@ -23,12 +23,12 @@ create row col =
     }
 
 
-view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
-view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Int -> Cell -> Html msg
+view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd cellSize row col cell =
     div
         [ Html.Attributes.class "cell"
-        , style "width" (String.fromInt Style.cellSize ++ "px")
-        , style "height" (String.fromInt Style.cellSize ++ "px")
+        , style "width" (String.fromInt cellSize ++ "px")
+        , style "height" (String.fromInt cellSize ++ "px")
         , style "border" ("2px solid " ++ Style.colors.border)
         , style "background-color" (getCellBackgroundColor cell)
         , style "display" "flex"
@@ -37,7 +37,7 @@ view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell =
         , style "cursor" "pointer"
         , style "user-select" "none"
         , style "font-weight" "bold"
-        , style "font-size" "16px"
+        , style "font-size" (String.fromInt (max 12 (cellSize // 2)) ++ "px")
         , style "color" (Style.numberColors cell.adjacentMines)
         , style "border-radius" "4px"
         , style "box-shadow" ("0 2px 4px " ++ Style.colors.shadow)

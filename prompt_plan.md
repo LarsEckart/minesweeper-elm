@@ -206,12 +206,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Implement classic number colors
 - **Output**: Fully styled game
 
-### Task 14: Responsive Design
-- [ ] Make grid scale to viewport width
-- [ ] Adjust cell sizes for mobile
-- [ ] Ensure header stays visible
-- [ ] Test on various screen sizes
-- [ ] Add viewport meta tag
+### Task 14: Responsive Design ✅
+- [x] Make grid scale to viewport width
+- [x] Adjust cell sizes for mobile
+- [x] Ensure header stays visible
+- [x] Test on various screen sizes
+- [x] Add viewport meta tag
 - **Output**: Mobile-responsive game
 
 ### Task 15: Difficulty Selection Modal

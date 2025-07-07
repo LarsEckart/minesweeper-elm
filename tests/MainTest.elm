@@ -22,6 +22,7 @@ suite =
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
+                            , viewportWidth = 800
                             }
 
                         ( updatedModel, _ ) =
@@ -39,6 +40,7 @@ suite =
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
+                            , viewportWidth = 800
                             }
 
                         ( updatedModel, _ ) =
@@ -56,6 +58,7 @@ suite =
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
+                            , viewportWidth = 800
                             }
 
                         ( updatedModel, _ ) =
@@ -73,6 +76,7 @@ suite =
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
+                            , viewportWidth = 800
                             }
 
                         ( updatedModel, _ ) =
@@ -90,6 +94,7 @@ suite =
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
+                            , viewportWidth = 800
                             }
 
                         ( updatedModel, _ ) =
