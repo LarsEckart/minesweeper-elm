@@ -12,15 +12,23 @@ A modern Minesweeper game built with Elm 0.19
 
 ```bash
 # Verify tests, formatting and linting
-./scripts/check.sh
+./check.sh
 ```
 
-### Workflow
+### Workflow - Trunk-Based Development
 
-1. Read a issue on GitHub using GitHub CLI
-2. Create a branch for your feature
-3. Implement your changes and **verify everything you did!**
-4. Use Playwright MCP to verify the game also from user's perspective
-5. Commit your changes with a descriptive message
-5. Push your branch to GitHub
-7. Create a pull request, mention which issue it closes and wait for review
+0. Ask which issue on GitHub we shall tackle
+1. Read issue on GitHub using GitHub CLI
+2. Pull latest changes from main branch
+3. Implement changes directly on main, keep commits small and focused
+4. Verify continuously: Run `./check.sh` frequently
+5. Use Playwright MCP to verify the game also from user's perspective
+6. Commit often with small, descriptive commits
+7. Push frequently to main branch
+
+**Key Principles:**
+- Work directly on main branch
+- Keep commits small and atomic
+- Push frequently to share progress
+- Use feature flags for incomplete features
+- Always ensure main is in working state
