@@ -1,0 +1,11 @@
+{
+  "name": "minesweeper-elm",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "./build_project.sh",
+    "test": "./scripts/check.sh"
+  },
+  "devDependencies": {
+    "elm": "^0.19.1-6"
+  }
+}

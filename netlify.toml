@@ -1,6 +1,6 @@
 [build]
-  command = "./build_project.sh"
+  command = "npm install && ./build_project.sh"
   publish = "dist"
 
 [build.environment]
-  ELM_VERSION = "0.19.1"
+  NODE_VERSION = "18"
