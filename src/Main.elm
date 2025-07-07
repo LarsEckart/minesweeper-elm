@@ -4,6 +4,7 @@ import Board
 import Browser
 import Cell exposing (Position)
 import Html exposing (Html, div, h1, text)
+import Random
 
 
 main : Program () Model Msg
@@ -27,7 +28,14 @@ type Msg
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { board = Board.empty 9 9 }, Cmd.none )
+    let
+        seed =
+            Random.initialSeed 42
+
+        board =
+            Board.withMines 9 9 10 seed
+    in
+    ( { board = board }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
