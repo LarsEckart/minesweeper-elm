@@ -166,11 +166,11 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for flagging logic
 - **Output**: Right-click flagging works
 
-### Task 9: Mobile Flag Support
-- [ ] Add touch event subscriptions
-- [ ] Implement long-press detection (500ms)
-- [ ] Add long-press to flag on mobile
-- [ ] Test on mobile browser
+### Task 9: Mobile Flag Support ✅
+- [x] Add touch event subscriptions
+- [x] Implement long-press detection (500ms)
+- [x] Add long-press to flag on mobile
+- [x] Test on mobile browser
 - **Output**: Long-press flagging on mobile
 
 ### Task 10: Timer Implementation

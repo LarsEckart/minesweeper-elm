@@ -18,8 +18,8 @@ empty rows cols =
             )
 
 
-view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Board -> Html msg
-view onCellClick onCellRightClick board =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Board -> Html msg
+view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd board =
     div
         [ style "display" "grid"
         , style "grid-template-columns" "repeat(9, 30px)"
@@ -28,12 +28,12 @@ view onCellClick onCellRightClick board =
         , style "padding" "10px"
         , style "background-color" "#f0f0f0"
         ]
-        (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick) board))
+        (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd) board))
 
 
-viewRow : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
-viewRow onCellClick onCellRightClick row cells =
-    List.indexedMap (\col cell -> Cell.view onCellClick onCellRightClick row col cell) cells
+viewRow : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
+viewRow onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row cells =
+    List.indexedMap (\col cell -> Cell.view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell) cells
 
 
 withMines : Int -> Int -> Int -> Random.Seed -> Board

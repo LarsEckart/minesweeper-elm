@@ -24,6 +24,7 @@ type alias Model =
     , difficulty : Difficulty
     , isFirstClick : Bool
     , mineCount : Int
+    , touchStart : Maybe { row : Int, col : Int, time : Int }
     }
 
 
@@ -42,5 +43,7 @@ type Difficulty
 type Msg
     = CellClicked Int Int
     | CellRightClicked Int Int
+    | CellTouchStart Int Int
+    | CellTouchEnd Int Int
     | NewGame Difficulty
     | NoOp

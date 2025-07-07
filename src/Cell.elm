@@ -21,8 +21,8 @@ create row col =
     }
 
 
-view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
-view onCellClick onCellRightClick row col cell =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
+view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd row col cell =
     div
         [ style "width" "30px"
         , style "height" "30px"
@@ -38,6 +38,8 @@ view onCellClick onCellRightClick row col cell =
         , style "color" (getNumberColor cell.adjacentMines)
         , onClick (onCellClick row col)
         , preventDefaultOn "contextmenu" (Decode.succeed ( onCellRightClick row col, True ))
+        , on "touchstart" (Decode.succeed (onCellTouchStart row col))
+        , on "touchend" (Decode.succeed (onCellTouchEnd row col))
         ]
         [ text (cellToString cell) ]
 

@@ -32,6 +32,7 @@ init _ =
       , difficulty = Types.Beginner
       , isFirstClick = True
       , mineCount = 10
+      , touchStart = Nothing
       }
     , Cmd.none
     )
@@ -53,6 +54,12 @@ update msg model =
 
         CellRightClicked row col ->
             handleRightClick row col model
+
+        CellTouchStart row col ->
+            handleTouchStart row col model
+
+        CellTouchEnd row col ->
+            handleTouchEnd row col model
 
         NewGame difficulty ->
             -- TODO: Implement new game functionality
@@ -213,6 +220,47 @@ handleRightClick row col model =
         )
 
 
+handleTouchStart : Int -> Int -> Model -> ( Model, Cmd Msg )
+handleTouchStart row col model =
+    -- Don't handle touch if game is over
+    if model.gameState /= Playing then
+        ( model, Cmd.none )
+
+    else
+        -- Record the touch start (simplified without timestamp for now)
+        ( { model | touchStart = Just { row = row, col = col, time = 0 } }
+        , Cmd.none
+        )
+
+
+handleTouchEnd : Int -> Int -> Model -> ( Model, Cmd Msg )
+handleTouchEnd row col model =
+    -- Don't handle touch if game is over
+    if model.gameState /= Playing then
+        ( model, Cmd.none )
+
+    else
+        case model.touchStart of
+            Just touchData ->
+                if touchData.row == row && touchData.col == col then
+                    -- Same cell, check if it was a long press (simulate 500ms)
+                    -- For now, we'll treat any touch as a long press since we can't
+                    -- easily get timestamp in pure Elm without subscriptions
+                    let
+                        updatedModel =
+                            { model | touchStart = Nothing }
+                    in
+                    handleRightClick row col updatedModel
+
+                else
+                    -- Different cell, reset touch state
+                    ( { model | touchStart = Nothing }, Cmd.none )
+
+            Nothing ->
+                -- No touch start recorded, treat as regular click
+                handleCellClick row col model
+
+
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell
 getCellAt board row col =
     board
@@ -227,7 +275,7 @@ view model =
         [ h1 [] [ text "Minesweeper" ]
         , gameStatusView model.gameState
         , mineCounterView model.mineCount
-        , Board.view CellClicked CellRightClicked model.board
+        , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
         ]
 
 
