@@ -190,12 +190,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for reset functionality
 - **Output**: Functional reset button
 
-### Task 12: Header Bar Layout
-- [ ] Create header bar with three sections
-- [ ] Position mine counter (left)
-- [ ] Position timer (right)
-- [ ] Position reset button (center)
-- [ ] Add basic styling
+### Task 12: Header Bar Layout ✅
+- [x] Create header bar with three sections
+- [x] Position mine counter (left)
+- [x] Position timer (right)
+- [x] Position reset button (center)
+- [x] Add basic styling
 - **Output**: Proper header layout
 
 ### Task 13: Vibrant Sunset Styling

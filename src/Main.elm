@@ -340,11 +340,80 @@ view model =
     div []
         [ h1 [] [ text "Minesweeper" ]
         , gameStatusView model.gameState
-        , mineCounterView model.mineCount
-        , resetButtonView model.gameState
-        , timerView model.timer
+        , headerBarView model
         , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.board
         ]
+
+
+headerBarView : Model -> Html Msg
+headerBarView model =
+    div
+        [ Html.Attributes.style "display" "flex"
+        , Html.Attributes.style "justify-content" "space-between"
+        , Html.Attributes.style "align-items" "center"
+        , Html.Attributes.style "padding" "10px 20px"
+        , Html.Attributes.style "border" "2px solid #ccc"
+        , Html.Attributes.style "border-radius" "8px"
+        , Html.Attributes.style "background-color" "#f8f8f8"
+        , Html.Attributes.style "margin" "10px 0"
+        ]
+        [ headerMineCounterView model.mineCount
+        , headerResetButtonView model.gameState
+        , headerTimerView model.timer
+        ]
+
+
+headerMineCounterView : Int -> Html Msg
+headerMineCounterView mineCount =
+    div
+        [ Html.Attributes.style "font-size" "16px"
+        , Html.Attributes.style "font-weight" "bold"
+        , Html.Attributes.style "color" "#333"
+        ]
+        [ text ("💣 " ++ String.fromInt mineCount) ]
+
+
+headerResetButtonView : GameState -> Html Msg
+headerResetButtonView gameState =
+    let
+        emoji =
+            case gameState of
+                Playing ->
+                    "🙂"
+
+                Won ->
+                    "😎"
+
+                Lost ->
+                    "😵"
+    in
+    button
+        [ Html.Events.onClick ResetGame
+        , Html.Attributes.style "font-size" "24px"
+        , Html.Attributes.style "padding" "8px 12px"
+        , Html.Attributes.style "border" "2px solid #ccc"
+        , Html.Attributes.style "border-radius" "6px"
+        , Html.Attributes.style "background-color" "#f0f0f0"
+        , Html.Attributes.style "cursor" "pointer"
+        ]
+        [ text emoji ]
+
+
+headerTimerView : Timer.Timer -> Html Msg
+headerTimerView timer =
+    let
+        seconds =
+            Timer.getSeconds timer
+
+        timeText =
+            Timer.formatTime seconds
+    in
+    div
+        [ Html.Attributes.style "font-size" "16px"
+        , Html.Attributes.style "font-weight" "bold"
+        , Html.Attributes.style "color" "#333"
+        ]
+        [ text ("⏱️ " ++ timeText) ]
 
 
 mineCounterView : Int -> Html Msg
