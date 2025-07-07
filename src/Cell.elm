@@ -2,7 +2,8 @@ module Cell exposing (create, view)
 
 import Html exposing (Html, div, text)
 import Html.Attributes exposing (style)
-import Html.Events exposing (onClick)
+import Html.Events exposing (on, onClick, preventDefaultOn)
+import Json.Decode as Decode
 import Types exposing (Cell, CellState(..))
 
 
@@ -20,8 +21,8 @@ create row col =
     }
 
 
-view : (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
-view onCellClick row col cell =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Int -> Cell -> Html msg
+view onCellClick onCellRightClick row col cell =
     div
         [ style "width" "30px"
         , style "height" "30px"
@@ -36,6 +37,7 @@ view onCellClick row col cell =
         , style "font-size" "14px"
         , style "color" (getNumberColor cell.adjacentMines)
         , onClick (onCellClick row col)
+        , preventDefaultOn "contextmenu" (Decode.succeed ( onCellRightClick row col, True ))
         ]
         [ text (cellToString cell) ]
 

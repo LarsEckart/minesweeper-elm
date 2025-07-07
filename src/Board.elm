@@ -1,4 +1,4 @@
-module Board exposing (empty, isLoss, isWin, revealAllMines, revealCell, revealCellWithFloodFill, view, withMines, withMinesAvoidingPosition)
+module Board exposing (empty, isLoss, isWin, revealAllMines, revealCell, revealCellWithFloodFill, toggleFlag, view, withMines, withMinesAvoidingPosition)
 
 import Array
 import Cell
@@ -18,8 +18,8 @@ empty rows cols =
             )
 
 
-view : (Int -> Int -> msg) -> Board -> Html msg
-view onCellClick board =
+view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Board -> Html msg
+view onCellClick onCellRightClick board =
     div
         [ style "display" "grid"
         , style "grid-template-columns" "repeat(9, 30px)"
@@ -28,12 +28,12 @@ view onCellClick board =
         , style "padding" "10px"
         , style "background-color" "#f0f0f0"
         ]
-        (List.concat (List.indexedMap (viewRow onCellClick) board))
+        (List.concat (List.indexedMap (viewRow onCellClick onCellRightClick) board))
 
 
-viewRow : (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
-viewRow onCellClick row cells =
-    List.indexedMap (\col cell -> Cell.view onCellClick row col cell) cells
+viewRow : (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> List Cell -> List (Html msg)
+viewRow onCellClick onCellRightClick row cells =
+    List.indexedMap (\col cell -> Cell.view onCellClick onCellRightClick row col cell) cells
 
 
 withMines : Int -> Int -> Int -> Random.Seed -> Board
@@ -363,5 +363,36 @@ revealAllMines board =
                         cell
                 )
                 row
+        )
+        board
+
+
+{-| Toggle flag state of a cell
+-}
+toggleFlag : Int -> Int -> Board -> Board
+toggleFlag row col board =
+    List.indexedMap
+        (\r cells ->
+            if r == row then
+                List.indexedMap
+                    (\c cell ->
+                        if c == col then
+                            case cell.state of
+                                Hidden ->
+                                    { cell | state = Flagged }
+
+                                Flagged ->
+                                    { cell | state = Hidden }
+
+                                Revealed ->
+                                    cell
+
+                        else
+                            cell
+                    )
+                    cells
+
+            else
+                cells
         )
         board

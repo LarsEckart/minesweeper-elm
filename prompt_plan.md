@@ -157,13 +157,13 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Optimize for performance
 - **Output**: Zeros auto-reveal neighbors
 
-### Task 8: Flag Functionality
-- [ ] Add Flagged state to Cell type
-- [ ] Implement right-click to flag/unflag
-- [ ] Add mine counter to Model
-- [ ] Update mine counter on flag/unflag
-- [ ] Prevent revealing flagged cells
-- [ ] Write tests for flagging logic
+### Task 8: Flag Functionality ✅
+- [x] Add Flagged state to Cell type
+- [x] Implement right-click to flag/unflag
+- [x] Add mine counter to Model
+- [x] Update mine counter on flag/unflag
+- [x] Prevent revealing flagged cells
+- [x] Write tests for flagging logic
 - **Output**: Right-click flagging works
 
 ### Task 9: Mobile Flag Support

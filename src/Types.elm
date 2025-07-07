@@ -23,6 +23,7 @@ type alias Model =
     , gameState : GameState
     , difficulty : Difficulty
     , isFirstClick : Bool
+    , mineCount : Int
     }
 
 

@@ -31,6 +31,7 @@ init _ =
       , gameState = Playing
       , difficulty = Types.Beginner
       , isFirstClick = True
+      , mineCount = 10
       }
     , Cmd.none
     )
@@ -51,8 +52,7 @@ update msg model =
                 handleCellClick row col model
 
         CellRightClicked row col ->
-            -- TODO: Implement right-click functionality for flagging
-            ( model, Cmd.none )
+            handleRightClick row col model
 
         NewGame difficulty ->
             -- TODO: Implement new game functionality
@@ -123,34 +123,94 @@ handleFirstClick row col model =
 handleCellClick : Int -> Int -> Model -> ( Model, Cmd Msg )
 handleCellClick row col model =
     let
-        updatedBoard =
-            Board.revealCellWithFloodFill row col model.board
+        -- Check if the clicked cell is flagged
+        clickedCell =
+            getCellAt model.board row col
 
-        -- Check win/loss conditions after click
-        newGameState =
-            if Board.isLoss updatedBoard then
-                Lost
+        -- Don't reveal flagged cells
+        canReveal =
+            case clickedCell of
+                Just cell ->
+                    cell.state /= Types.Flagged
 
-            else if Board.isWin updatedBoard then
-                Won
-
-            else
-                Playing
-
-        -- Reveal all mines if game is lost
-        finalBoard =
-            if newGameState == Lost then
-                Board.revealAllMines updatedBoard
-
-            else
-                updatedBoard
+                Nothing ->
+                    False
     in
-    ( { model
-        | board = finalBoard
-        , gameState = newGameState
-      }
-    , Cmd.none
-    )
+    if canReveal then
+        let
+            updatedBoard =
+                Board.revealCellWithFloodFill row col model.board
+
+            -- Check win/loss conditions after click
+            newGameState =
+                if Board.isLoss updatedBoard then
+                    Lost
+
+                else if Board.isWin updatedBoard then
+                    Won
+
+                else
+                    Playing
+
+            -- Reveal all mines if game is lost
+            finalBoard =
+                if newGameState == Lost then
+                    Board.revealAllMines updatedBoard
+
+                else
+                    updatedBoard
+        in
+        ( { model
+            | board = finalBoard
+            , gameState = newGameState
+          }
+        , Cmd.none
+        )
+
+    else
+        ( model, Cmd.none )
+
+
+handleRightClick : Int -> Int -> Model -> ( Model, Cmd Msg )
+handleRightClick row col model =
+    -- Don't allow flagging if game is over
+    if model.gameState /= Playing then
+        ( model, Cmd.none )
+
+    else
+        let
+            -- Get the current cell to check its state
+            clickedCell =
+                getCellAt model.board row col
+
+            newBoard =
+                Board.toggleFlag row col model.board
+
+            -- Update mine counter based on flag change
+            newMineCount =
+                case clickedCell of
+                    Just cell ->
+                        if cell.state == Types.Hidden then
+                            -- Flagging a cell, decrease mine count
+                            model.mineCount - 1
+
+                        else if cell.state == Types.Flagged then
+                            -- Unflagging a cell, increase mine count
+                            model.mineCount + 1
+
+                        else
+                            -- Revealed cells can't be flagged
+                            model.mineCount
+
+                    Nothing ->
+                        model.mineCount
+        in
+        ( { model
+            | board = newBoard
+            , mineCount = newMineCount
+          }
+        , Cmd.none
+        )
 
 
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell
@@ -166,8 +226,15 @@ view model =
     div []
         [ h1 [] [ text "Minesweeper" ]
         , gameStatusView model.gameState
-        , Board.view CellClicked model.board
+        , mineCounterView model.mineCount
+        , Board.view CellClicked CellRightClicked model.board
         ]
+
+
+mineCounterView : Int -> Html Msg
+mineCounterView mineCount =
+    div [ Html.Attributes.style "font-size" "16px", Html.Attributes.style "margin" "10px 0", Html.Attributes.style "font-weight" "bold" ]
+        [ text ("💣 " ++ String.fromInt mineCount) ]
 
 
 gameStatusView : GameState -> Html Msg

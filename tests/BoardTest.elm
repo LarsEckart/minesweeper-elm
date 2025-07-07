@@ -708,6 +708,91 @@ suite =
                         _ ->
                             Expect.fail "Could not get expected cells"
             ]
+        , describe "toggleFlag"
+            [ test "flags a hidden cell" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+                                |> Board.toggleFlag 1 1
+                                
+                        flaggedCell =
+                            getCell board 1 1
+                    in
+                    case flaggedCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Flagged
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (1,1)"
+            , test "unflags a flagged cell" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+                                |> Board.toggleFlag 1 1
+                                |> Board.toggleFlag 1 1
+                                
+                        unflaggedCell =
+                            getCell board 1 1
+                    in
+                    case unflaggedCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Hidden
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (1,1)"
+            , test "does not affect revealed cells" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+                                |> Board.revealCell 1 1
+                                |> Board.toggleFlag 1 1
+                                
+                        revealedCell =
+                            getCell board 1 1
+                    in
+                    case revealedCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Revealed
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (1,1)"
+            , test "does not affect other cells" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+                                |> Board.toggleFlag 1 1
+                                
+                        otherCell =
+                            getCell board 0 0
+                    in
+                    case otherCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Hidden
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (0,0)"
+            , test "handles invalid positions gracefully" <|
+                \_ ->
+                    let
+                        board =
+                            Board.empty 3 3
+                                |> Board.toggleFlag 5 5
+                                
+                        -- Board should remain unchanged
+                        centerCell =
+                            getCell board 1 1
+                    in
+                    case centerCell of
+                        Just cell ->
+                            cell.state
+                                |> Expect.equal Hidden
+                        Nothing ->
+                            Expect.fail "Could not get cell at position (1,1)"
+            ]
         ]
 
 
