@@ -19,6 +19,7 @@ type State
 type alias Cell =
     { position : Position
     , state : State
+    , isMine : Bool
     }
 
 
@@ -26,6 +27,7 @@ create : Int -> Int -> Cell
 create row col =
     { position = { row = row, col = col }
     , state = Hidden
+    , isMine = False
     }
 
 
@@ -43,14 +45,22 @@ view onCellClick cell =
         , style "user-select" "none"
         , onClick (onCellClick cell.position)
         ]
-        [ text (stateToString cell.state) ]
+        [ text (cellToString cell) ]
 
 
-stateToString : State -> String
-stateToString state =
-    case state of
+cellToString : Cell -> String
+cellToString cell =
+    case cell.state of
         Hidden ->
-            ""
+            if cell.isMine then
+                "💣"
+
+            else
+                ""
 
         Revealed ->
-            "R"
+            if cell.isMine then
+                "💣"
+
+            else
+                "R"
