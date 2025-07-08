@@ -3,8 +3,9 @@ module Modal exposing (difficultySelectionModal)
 import Html exposing (Html, button, div, h2, p, text)
 import Html.Attributes
 import Html.Events
+import LeaderBoard exposing (Difficulty(..))
 import Style
-import Types exposing (Difficulty(..), Msg(..))
+import Types exposing (Msg(..))
 
 
 difficultySelectionModal : Html Msg
@@ -48,8 +49,8 @@ difficultySelectionModal =
                 , Html.Attributes.style "gap" "15px"
                 ]
                 [ difficultyButton "Beginner" "9x9, 10 mines" Beginner
-                , difficultyButton "Intermediate" "16x16, 40 mines" Intermediate
-                , difficultyButton "Expert" "16x30, 99 mines" Expert
+                , difficultyButton "Intermediate" "12x12, 25 mines" Intermediate
+                , difficultyButton "Expert" "15x15, 50 mines" Expert
                 ]
             ]
         ]

@@ -223,12 +223,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Add difficulty button to header for changing difficulty
 - **Output**: Difficulty selection works
 
-### Task 16: LocalStorage Ports
-- [ ] Create ports for localStorage get/set
-- [ ] Add minimal JavaScript interop code
-- [ ] Create LeaderBoard.elm module
-- [ ] Implement best time storage per difficulty
-- [ ] Write tests for port messages
+### Task 16: LocalStorage Ports ✅
+- [x] Create ports for localStorage get/set
+- [x] Add minimal JavaScript interop code
+- [x] Create LeaderBoard.elm module
+- [x] Implement best time storage per difficulty
+- [x] Write tests for port messages
 - **Output**: Best times persist
 
 ### Task 17: Win Dialog

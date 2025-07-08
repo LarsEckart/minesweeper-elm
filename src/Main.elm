@@ -7,13 +7,15 @@ import Html exposing (Html, button, div, h1, text)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
+import LeaderBoard exposing (Difficulty(..))
 import Modal
+import Ports
 import Random
 import Style
 import Task
 import Time
 import Timer
-import Types exposing (Board, Difficulty(..), GameState(..), Model, Msg(..))
+import Types exposing (Board, GameState(..), Model, Msg(..))
 
 
 main : Program () Model Msg
@@ -37,8 +39,12 @@ init _ =
       , timer = Timer.init
       , viewportWidth = 800
       , showDifficultyModal = True
+      , leaderBoard = LeaderBoard.init
       }
-    , Task.perform ViewportResize (Task.succeed 800)
+    , Cmd.batch
+        [ Task.perform ViewportResize (Task.succeed 800)
+        , Ports.loadLeaderboard ()
+        ]
     )
 
 
@@ -82,10 +88,10 @@ update msg model =
                             ( 9, 9, 10 )
 
                         Intermediate ->
-                            ( 16, 16, 40 )
+                            ( 12, 12, 25 )
 
                         Expert ->
-                            ( 16, 30, 99 )
+                            ( 15, 15, 50 )
 
                 newBoard =
                     Board.withMines rows cols mines seed
@@ -113,10 +119,10 @@ update msg model =
                             ( 9, 9, 10 )
 
                         Intermediate ->
-                            ( 16, 16, 40 )
+                            ( 12, 12, 25 )
 
                         Expert ->
-                            ( 16, 30, 99 )
+                            ( 15, 15, 50 )
 
                 newBoard =
                     Board.withMines rows cols mines seed
@@ -139,6 +145,21 @@ update msg model =
 
         ViewportResize width ->
             ( { model | viewportWidth = width }, Cmd.none )
+
+        LoadLeaderBoard ->
+            ( model, Ports.loadLeaderboard () )
+
+        LeaderBoardLoaded maybeLeaderBoard ->
+            let
+                leaderBoard =
+                    case maybeLeaderBoard of
+                        Just lb ->
+                            lb
+
+                        Nothing ->
+                            LeaderBoard.init
+            in
+            ( { model | leaderBoard = leaderBoard }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
@@ -165,8 +186,19 @@ handleFirstClick row col model =
                 let
                     seed =
                         Random.initialSeed 42
+
+                    ( rows, cols, mines ) =
+                        case model.difficulty of
+                            Beginner ->
+                                ( 9, 9, 10 )
+
+                            Intermediate ->
+                                ( 12, 12, 25 )
+
+                            Expert ->
+                                ( 15, 15, 50 )
                 in
-                Board.withMinesAvoidingPosition 9 9 10 seed row col
+                Board.withMinesAvoidingPosition rows cols mines seed row col
 
             else
                 model.board
@@ -192,14 +224,39 @@ handleFirstClick row col model =
 
             else
                 updatedBoard
+
+        -- Update leaderboard and save if game is won
+        ( updatedLeaderBoard, saveCmd ) =
+            if newGameState == Won then
+                let
+                    finalTime =
+                        Timer.getSeconds model.timer
+
+                    newLeaderBoard =
+                        LeaderBoard.updateBestTime model.difficulty finalTime model.leaderBoard
+                in
+                ( newLeaderBoard, Ports.saveLeaderboard (LeaderBoard.encode newLeaderBoard) )
+
+            else
+                ( model.leaderBoard, Cmd.none )
+
+        -- Update timer based on game state
+        updatedTimer =
+            case newGameState of
+                Playing ->
+                    Timer.start
+
+                _ ->
+                    Timer.stop model.timer
     in
     ( { model
         | board = finalBoard
         , gameState = newGameState
         , isFirstClick = False
-        , timer = Timer.start
+        , timer = updatedTimer
+        , leaderBoard = updatedLeaderBoard
       }
-    , Cmd.none
+    , saveCmd
     )
 
 
@@ -242,18 +299,37 @@ handleCellClick row col model =
 
                 else
                     updatedBoard
-        in
-        ( { model
-            | board = finalBoard
-            , gameState = newGameState
-            , timer =
+
+            -- Update leaderboard and save if game is won
+            ( updatedLeaderBoard, saveCmd ) =
+                if newGameState == Won then
+                    let
+                        finalTime =
+                            Timer.getSeconds model.timer
+
+                        newLeaderBoard =
+                            LeaderBoard.updateBestTime model.difficulty finalTime model.leaderBoard
+                    in
+                    ( newLeaderBoard, Ports.saveLeaderboard (LeaderBoard.encode newLeaderBoard) )
+
+                else
+                    ( model.leaderBoard, Cmd.none )
+
+            -- Update timer based on game state
+            updatedTimer =
                 if newGameState /= Playing then
                     Timer.stop model.timer
 
                 else
                     model.timer
+        in
+        ( { model
+            | board = finalBoard
+            , gameState = newGameState
+            , timer = updatedTimer
+            , leaderBoard = updatedLeaderBoard
           }
-        , Cmd.none
+        , saveCmd
         )
 
     else
@@ -373,8 +449,19 @@ subscriptions model =
 
         viewportSub =
             Browser.Events.onResize (\w _ -> ViewportResize w)
+
+        leaderboardSub =
+            Ports.leaderboardLoaded
+                (\value ->
+                    case Decode.decodeValue (Decode.nullable LeaderBoard.decode) value of
+                        Ok maybeLeaderBoard ->
+                            LeaderBoardLoaded maybeLeaderBoard
+
+                        Err _ ->
+                            LeaderBoardLoaded Nothing
+                )
     in
-    Sub.batch [ timerSub, viewportSub ]
+    Sub.batch [ timerSub, viewportSub, leaderboardSub ]
 
 
 getCellAt : Board -> Int -> Int -> Maybe Types.Cell

@@ -46,6 +46,29 @@
     var app = Elm.Main.init({
       node: document.getElementById('elm')
     });
+
+    // localStorage port handlers
+    app.ports.saveLeaderboard.subscribe(function(data) {
+      try {
+        localStorage.setItem('minesweeper-leaderboard', JSON.stringify(data));
+      } catch (e) {
+        console.error('Failed to save leaderboard:', e);
+      }
+    });
+
+    app.ports.loadLeaderboard.subscribe(function() {
+      try {
+        var data = localStorage.getItem('minesweeper-leaderboard');
+        if (data) {
+          app.ports.leaderboardLoaded.send(JSON.parse(data));
+        } else {
+          app.ports.leaderboardLoaded.send(null);
+        }
+      } catch (e) {
+        console.error('Failed to load leaderboard:', e);
+        app.ports.leaderboardLoaded.send(null);
+      }
+    });
   </script>
 </body>
 </html>

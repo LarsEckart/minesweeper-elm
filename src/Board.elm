@@ -23,8 +23,12 @@ empty rows cols =
 view : (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> (Int -> Int -> msg) -> Int -> Board -> Html msg
 view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd viewportWidth board =
     let
+        -- Calculate actual board dimensions
+        cols =
+            List.head board |> Maybe.map List.length |> Maybe.withDefault 0
+
         cellSize =
-            Style.responsiveCellSize viewportWidth 9
+            Style.responsiveCellSize viewportWidth cols
 
         gridGap =
             Style.responsiveGridGap viewportWidth
@@ -46,7 +50,7 @@ view onCellClick onCellRightClick onCellTouchStart onCellTouchEnd viewportWidth 
     div
         [ Html.Attributes.class "grid"
         , style "display" "grid"
-        , style "grid-template-columns" ("repeat(9, " ++ String.fromInt cellSize ++ "px)")
+        , style "grid-template-columns" ("repeat(" ++ String.fromInt cols ++ ", " ++ String.fromInt cellSize ++ "px)")
         , style "gap" (String.fromInt gridGap ++ "px")
         , style "border" (String.fromInt borderWidth ++ "px solid " ++ Style.colors.border)
         , style "padding" (String.fromInt padding ++ "px")

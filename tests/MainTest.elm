@@ -1,6 +1,7 @@
 module MainTest exposing (..)
 
 import Expect
+import LeaderBoard exposing (Difficulty(..))
 import Main
 import Test exposing (Test, describe, test)
 import Timer
@@ -17,13 +18,14 @@ suite =
                         initialModel =
                             { board = []
                             , gameState = Lost
-                            , difficulty = Types.Beginner
+                            , difficulty = Beginner
                             , isFirstClick = False
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , leaderBoard = LeaderBoard.init
                             }
 
                         ( updatedModel, _ ) =
@@ -36,13 +38,14 @@ suite =
                         initialModel =
                             { board = []
                             , gameState = Lost
-                            , difficulty = Types.Beginner
+                            , difficulty = Beginner
                             , isFirstClick = False
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , leaderBoard = LeaderBoard.init
                             }
 
                         ( updatedModel, _ ) =
@@ -55,13 +58,14 @@ suite =
                         initialModel =
                             { board = []
                             , gameState = Lost
-                            , difficulty = Types.Beginner
+                            , difficulty = Beginner
                             , isFirstClick = False
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , leaderBoard = LeaderBoard.init
                             }
 
                         ( updatedModel, _ ) =
@@ -74,13 +78,14 @@ suite =
                         initialModel =
                             { board = []
                             , gameState = Lost
-                            , difficulty = Types.Beginner
+                            , difficulty = Beginner
                             , isFirstClick = False
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , leaderBoard = LeaderBoard.init
                             }
 
                         ( updatedModel, _ ) =
@@ -93,13 +98,14 @@ suite =
                         initialModel =
                             { board = []
                             , gameState = Lost
-                            , difficulty = Types.Beginner
+                            , difficulty = Beginner
                             , isFirstClick = False
                             , mineCount = 5
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , leaderBoard = LeaderBoard.init
                             }
 
                         ( updatedModel, _ ) =

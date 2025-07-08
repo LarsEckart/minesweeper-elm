@@ -1,5 +1,6 @@
 module Types exposing (..)
 
+import LeaderBoard exposing (Difficulty(..))
 import Time
 import Timer
 
@@ -31,6 +32,7 @@ type alias Model =
     , timer : Timer.Timer
     , viewportWidth : Int
     , showDifficultyModal : Bool
+    , leaderBoard : LeaderBoard.LeaderBoard
     }
 
 
@@ -38,12 +40,6 @@ type GameState
     = Playing
     | Won
     | Lost
-
-
-type Difficulty
-    = Beginner
-    | Intermediate
-    | Expert
 
 
 type Msg
@@ -58,4 +54,6 @@ type Msg
     | ResetGame
     | ShowDifficultyModal
     | ViewportResize Int
+    | LoadLeaderBoard
+    | LeaderBoardLoaded (Maybe LeaderBoard.LeaderBoard)
     | NoOp
