@@ -9,10 +9,11 @@ A modern Minesweeper game built with Elm 0.19, featuring classic gameplay with t
 ## Features
 
 - **Classic Minesweeper gameplay** with left-click to reveal and right-click to flag
-- **Three difficulty levels**: Beginner, Intermediate, and Expert
+- **Three difficulty levels**: Beginner (9x9, 10 mines), Intermediate (12x12, 25 mines), and Expert (15x15, 50 mines)
 - **Vibrant Sunset color palette** for a modern, appealing look
 - **Mobile-responsive design** that works on all devices
 - **Leaderboard system** with localStorage persistence
+- **Deterministic seed support** for testing with URL parameter `?seed=123`
 - **Comprehensive testing** and CI/CD pipeline
 
 ## Development
@@ -43,7 +44,7 @@ npm install -g elm-format elm-test
 ./build_project.sh
 
 # Run tests, formatting, and linting
-./scripts/check.sh
+./check.sh
 
 # Format code
 elm-format src/ --yes
@@ -51,6 +52,26 @@ elm-format src/ --yes
 # Run tests
 elm-test
 ```
+
+### Testing with Seeds
+
+For deterministic testing, you can use the seed parameter:
+
+```bash
+# Open the built game with a specific seed
+open dist/index.html?seed=123
+
+# Or in your browser:
+# file:///path/to/minesweeper-elm/dist/index.html?seed=123
+```
+
+The seed parameter allows you to:
+- Generate the same board layout every time
+- Test specific scenarios consistently
+- Debug issues with reproducible board states
+- Compare game outcomes across different runs
+
+Seeds are integers (e.g., 123, 999, 42) and are hidden from the UI for clean gameplay.
 
 ### Project Structure
 

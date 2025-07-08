@@ -35,6 +35,7 @@ type alias Model =
     , showLeaderBoardModal : Bool
     , showWinModal : Bool
     , leaderBoard : LeaderBoard.LeaderBoard
+    , seed : Int
     }
 
 

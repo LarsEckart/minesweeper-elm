@@ -28,6 +28,7 @@ suite =
                             , showLeaderBoardModal = False
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
+                            , seed = 42
                             }
 
                         ( updatedModel, _ ) =
@@ -50,6 +51,7 @@ suite =
                             , showLeaderBoardModal = False
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
+                            , seed = 42
                             }
 
                         ( updatedModel, _ ) =
@@ -72,6 +74,7 @@ suite =
                             , showLeaderBoardModal = False
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
+                            , seed = 42
                             }
 
                         ( updatedModel, _ ) =
@@ -94,6 +97,7 @@ suite =
                             , showLeaderBoardModal = False
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
+                            , seed = 42
                             }
 
                         ( updatedModel, _ ) =
@@ -116,6 +120,7 @@ suite =
                             , showLeaderBoardModal = False
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
+                            , seed = 42
                             }
 
                         ( updatedModel, _ ) =

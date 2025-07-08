@@ -43,8 +43,14 @@
   <div id="elm"></div>
   <script src="main.js"></script>
   <script>
+    // Parse seed from URL parameters
+    var urlParams = new URLSearchParams(window.location.search);
+    var seedParam = urlParams.get('seed');
+    var seed = seedParam ? parseInt(seedParam, 10) : null;
+    
     var app = Elm.Main.init({
-      node: document.getElementById('elm')
+      node: document.getElementById('elm'),
+      flags: seed
     });
 
     // localStorage port handlers

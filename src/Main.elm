@@ -18,7 +18,7 @@ import Timer
 import Types exposing (Board, GameState(..), Model, Msg(..))
 
 
-main : Program () Model Msg
+main : Program (Maybe Int) Model Msg
 main =
     Browser.element
         { init = init
@@ -28,8 +28,17 @@ main =
         }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
+init : Maybe Int -> ( Model, Cmd Msg )
+init maybeSeed =
+    let
+        seedValue =
+            case maybeSeed of
+                Just s ->
+                    s
+
+                Nothing ->
+                    42
+    in
     ( { board = []
       , gameState = Playing
       , difficulty = Beginner
@@ -42,6 +51,7 @@ init _ =
       , showLeaderBoardModal = False
       , showWinModal = False
       , leaderBoard = LeaderBoard.init
+      , seed = seedValue
       }
     , Cmd.batch
         [ Task.perform ViewportResize (Task.succeed 800)
@@ -82,7 +92,7 @@ update msg model =
         NewGame difficulty ->
             let
                 seed =
-                    Random.initialSeed 42
+                    Random.initialSeed model.seed
 
                 ( rows, cols, mines ) =
                     case difficulty of
@@ -114,7 +124,7 @@ update msg model =
         ResetGame ->
             let
                 seed =
-                    Random.initialSeed 42
+                    Random.initialSeed model.seed
 
                 ( rows, cols, mines ) =
                     case model.difficulty of
@@ -210,7 +220,7 @@ handleFirstClick row col model =
                 -- Regenerate board avoiding the clicked position and its neighbors
                 let
                     seed =
-                        Random.initialSeed 42
+                        Random.initialSeed model.seed
 
                     ( rows, cols, mines ) =
                         case model.difficulty of
