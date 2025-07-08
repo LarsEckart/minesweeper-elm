@@ -26,6 +26,7 @@ suite =
                             , viewportWidth = 800
                             , showDifficultyModal = False
                             , showLeaderBoardModal = False
+                            , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -47,6 +48,7 @@ suite =
                             , viewportWidth = 800
                             , showDifficultyModal = False
                             , showLeaderBoardModal = False
+                            , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -68,6 +70,7 @@ suite =
                             , viewportWidth = 800
                             , showDifficultyModal = False
                             , showLeaderBoardModal = False
+                            , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -89,6 +92,7 @@ suite =
                             , viewportWidth = 800
                             , showDifficultyModal = False
                             , showLeaderBoardModal = False
+                            , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -110,6 +114,7 @@ suite =
                             , viewportWidth = 800
                             , showDifficultyModal = False
                             , showLeaderBoardModal = False
+                            , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 

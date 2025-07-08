@@ -231,12 +231,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Write tests for port messages
 - **Output**: Best times persist
 
-### Task 17: Win Dialog
-- [ ] Create win dialog modal
-- [ ] Show current time vs best time
-- [ ] Update best time if beaten
-- [ ] Add "Play Again" button
-- [ ] Style with theme colors
+### Task 17: Win Dialog ✅
+- [x] Create win dialog modal
+- [x] Show current time vs best time
+- [x] Update best time if beaten
+- [x] Add "Play Again" button
+- [x] Style with theme colors
 - **Output**: Win celebration modal
 
 ### Task 18: Leaderboard Modal ✅

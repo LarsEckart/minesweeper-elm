@@ -1,4 +1,4 @@
-module Modal exposing (difficultySelectionModal, leaderBoardModal)
+module Modal exposing (difficultySelectionModal, leaderBoardModal, winModal)
 
 import Html exposing (Html, button, div, h2, h3, p, text)
 import Html.Attributes
@@ -158,6 +158,143 @@ bestTimeEntry difficultyName maybeBestTime =
                     Nothing ->
                         "No record"
                 )
+            ]
+        ]
+
+
+winModal : Difficulty -> Int -> LeaderBoard.LeaderBoard -> Html Msg
+winModal difficulty currentTime leaderBoard =
+    let
+        currentBestTime =
+            LeaderBoard.getBestTime difficulty leaderBoard
+
+        isNewRecord =
+            case currentBestTime of
+                Nothing ->
+                    True
+
+                Just bestTime ->
+                    currentTime < bestTime
+
+        difficultyText =
+            case difficulty of
+                Beginner ->
+                    "Beginner"
+
+                Intermediate ->
+                    "Intermediate"
+
+                Expert ->
+                    "Expert"
+    in
+    div
+        [ Html.Attributes.style "position" "fixed"
+        , Html.Attributes.style "top" "0"
+        , Html.Attributes.style "left" "0"
+        , Html.Attributes.style "width" "100%"
+        , Html.Attributes.style "height" "100%"
+        , Html.Attributes.style "background-color" "rgba(0,0,0,0.5)"
+        , Html.Attributes.style "display" "flex"
+        , Html.Attributes.style "justify-content" "center"
+        , Html.Attributes.style "align-items" "center"
+        , Html.Attributes.style "z-index" "1000"
+        ]
+        [ div
+            [ Html.Attributes.style "background-color" Style.colors.background
+            , Html.Attributes.style "padding" "40px"
+            , Html.Attributes.style "border-radius" "15px"
+            , Html.Attributes.style "border" ("3px solid " ++ Style.colors.border)
+            , Html.Attributes.style "box-shadow" ("0 8px 16px " ++ Style.colors.shadow)
+            , Html.Attributes.style "max-width" "450px"
+            , Html.Attributes.style "text-align" "center"
+            ]
+            [ h2
+                [ Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "margin-bottom" "20px"
+                , Html.Attributes.style "text-shadow" "2px 2px 4px rgba(0,0,0,0.3)"
+                ]
+                [ text "🎉 Congratulations! 🎉" ]
+            , p
+                [ Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "margin-bottom" "20px"
+                , Html.Attributes.style "font-size" "18px"
+                , Html.Attributes.style "font-weight" "bold"
+                ]
+                [ text ("You completed " ++ difficultyText ++ " mode!") ]
+            , div
+                [ Html.Attributes.style "margin-bottom" "20px"
+                , Html.Attributes.style "padding" "15px"
+                , Html.Attributes.style "background-color" Style.colors.primary
+                , Html.Attributes.style "border-radius" "10px"
+                , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+                ]
+                [ div
+                    [ Html.Attributes.style "color" Style.colors.text
+                    , Html.Attributes.style "font-size" "16px"
+                    , Html.Attributes.style "margin-bottom" "10px"
+                    ]
+                    [ text ("Your Time: " ++ Timer.formatTime currentTime) ]
+                , div
+                    [ Html.Attributes.style "color" Style.colors.text
+                    , Html.Attributes.style "font-size" "16px"
+                    ]
+                    [ text
+                        ("Best Time: "
+                            ++ (case currentBestTime of
+                                    Nothing ->
+                                        "No record"
+
+                                    Just bestTime ->
+                                        Timer.formatTime bestTime
+                               )
+                        )
+                    ]
+                , if isNewRecord then
+                    div
+                        [ Html.Attributes.style "color" Style.colors.accent
+                        , Html.Attributes.style "font-size" "18px"
+                        , Html.Attributes.style "font-weight" "bold"
+                        , Html.Attributes.style "margin-top" "10px"
+                        ]
+                        [ text "🏆 New Record!" ]
+
+                  else
+                    text ""
+                ]
+            , div
+                [ Html.Attributes.style "display" "flex"
+                , Html.Attributes.style "gap" "15px"
+                , Html.Attributes.style "justify-content" "center"
+                ]
+                [ button
+                    [ Html.Events.onClick ResetGame
+                    , Html.Attributes.style "background-color" Style.colors.secondary
+                    , Html.Attributes.style "color" Style.colors.text
+                    , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+                    , Html.Attributes.style "border-radius" "8px"
+                    , Html.Attributes.style "padding" "12px 24px"
+                    , Html.Attributes.style "cursor" "pointer"
+                    , Html.Attributes.style "font-size" "16px"
+                    , Html.Attributes.style "font-weight" "bold"
+                    , Html.Attributes.style "transition" "all 0.3s ease"
+                    , Html.Attributes.style "box-shadow" ("0 2px 4px " ++ Style.colors.shadow)
+                    ]
+                    [ text "Play Again" ]
+                , button
+                    [ Html.Events.onClick CloseWinModal
+                    , Html.Attributes.style "background-color" Style.colors.primary
+                    , Html.Attributes.style "color" Style.colors.text
+                    , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+                    , Html.Attributes.style "border-radius" "8px"
+                    , Html.Attributes.style "padding" "12px 24px"
+                    , Html.Attributes.style "cursor" "pointer"
+                    , Html.Attributes.style "font-size" "16px"
+                    , Html.Attributes.style "font-weight" "bold"
+                    , Html.Attributes.style "transition" "all 0.3s ease"
+                    , Html.Attributes.style "box-shadow" ("0 2px 4px " ++ Style.colors.shadow)
+                    ]
+                    [ text "Close" ]
+                ]
             ]
         ]
 

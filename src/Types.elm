@@ -33,6 +33,7 @@ type alias Model =
     , viewportWidth : Int
     , showDifficultyModal : Bool
     , showLeaderBoardModal : Bool
+    , showWinModal : Bool
     , leaderBoard : LeaderBoard.LeaderBoard
     }
 
@@ -56,6 +57,8 @@ type Msg
     | ShowDifficultyModal
     | ShowLeaderBoardModal
     | CloseLeaderBoardModal
+    | ShowWinModal
+    | CloseWinModal
     | ClearLeaderBoard
     | ViewportResize Int
     | LoadLeaderBoard

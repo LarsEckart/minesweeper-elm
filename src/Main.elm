@@ -40,6 +40,7 @@ init _ =
       , viewportWidth = 800
       , showDifficultyModal = True
       , showLeaderBoardModal = False
+      , showWinModal = False
       , leaderBoard = LeaderBoard.init
       }
     , Cmd.batch
@@ -105,6 +106,7 @@ update msg model =
                 , mineCount = mines
                 , timer = Timer.init
                 , showDifficultyModal = False
+                , showWinModal = False
               }
             , Cmd.none
             )
@@ -134,6 +136,7 @@ update msg model =
                 , isFirstClick = True
                 , mineCount = mines
                 , timer = Timer.init
+                , showWinModal = False
               }
             , Cmd.none
             )
@@ -149,6 +152,12 @@ update msg model =
 
         CloseLeaderBoardModal ->
             ( { model | showLeaderBoardModal = False }, Cmd.none )
+
+        ShowWinModal ->
+            ( { model | showWinModal = True }, Cmd.none )
+
+        CloseWinModal ->
+            ( { model | showWinModal = False }, Cmd.none )
 
         ClearLeaderBoard ->
             let
@@ -256,6 +265,14 @@ handleFirstClick row col model =
             else
                 ( model.leaderBoard, Cmd.none )
 
+        -- Show win modal when game is won
+        updatedShowWinModal =
+            if newGameState == Won then
+                True
+
+            else
+                model.showWinModal
+
         -- Update timer based on game state
         updatedTimer =
             case newGameState of
@@ -271,6 +288,7 @@ handleFirstClick row col model =
         , isFirstClick = False
         , timer = updatedTimer
         , leaderBoard = updatedLeaderBoard
+        , showWinModal = updatedShowWinModal
       }
     , saveCmd
     )
@@ -331,6 +349,14 @@ handleCellClick row col model =
                 else
                     ( model.leaderBoard, Cmd.none )
 
+            -- Show win modal when game is won
+            updatedShowWinModal =
+                if newGameState == Won then
+                    True
+
+                else
+                    model.showWinModal
+
             -- Update timer based on game state
             updatedTimer =
                 if newGameState /= Playing then
@@ -344,6 +370,7 @@ handleCellClick row col model =
             , gameState = newGameState
             , timer = updatedTimer
             , leaderBoard = updatedLeaderBoard
+            , showWinModal = updatedShowWinModal
           }
         , saveCmd
         )
@@ -520,6 +547,9 @@ view model =
 
             else if model.showLeaderBoardModal then
                 [ Modal.leaderBoardModal model.leaderBoard ]
+
+            else if model.showWinModal then
+                [ Modal.winModal model.difficulty (Timer.getSeconds model.timer) model.leaderBoard ]
 
             else
                 []
