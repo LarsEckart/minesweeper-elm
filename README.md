@@ -4,6 +4,8 @@
 
 A modern Minesweeper game built with Elm 0.19, featuring classic gameplay with three difficulty levels, vibrant Sunset color palette, mobile-responsive design, and leaderboard with localStorage persistence.
 
+**🌐 Play Online**: https://minesweepr-elm.netlify.app/
+
 ## Features
 
 - **Classic Minesweeper gameplay** with left-click to reveal and right-click to flag
