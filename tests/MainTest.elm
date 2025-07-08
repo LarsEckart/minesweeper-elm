@@ -25,6 +25,7 @@ suite =
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , showLeaderBoardModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -45,6 +46,7 @@ suite =
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , showLeaderBoardModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -65,6 +67,7 @@ suite =
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , showLeaderBoardModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -85,6 +88,7 @@ suite =
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , showLeaderBoardModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 
@@ -105,6 +109,7 @@ suite =
                             , timer = Timer.start
                             , viewportWidth = 800
                             , showDifficultyModal = False
+                            , showLeaderBoardModal = False
                             , leaderBoard = LeaderBoard.init
                             }
 

@@ -32,6 +32,7 @@ type alias Model =
     , timer : Timer.Timer
     , viewportWidth : Int
     , showDifficultyModal : Bool
+    , showLeaderBoardModal : Bool
     , leaderBoard : LeaderBoard.LeaderBoard
     }
 
@@ -53,6 +54,9 @@ type Msg
     | TimerTick Time.Posix
     | ResetGame
     | ShowDifficultyModal
+    | ShowLeaderBoardModal
+    | CloseLeaderBoardModal
+    | ClearLeaderBoard
     | ViewportResize Int
     | LoadLeaderBoard
     | LeaderBoardLoaded (Maybe LeaderBoard.LeaderBoard)

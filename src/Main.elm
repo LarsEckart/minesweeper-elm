@@ -39,6 +39,7 @@ init _ =
       , timer = Timer.init
       , viewportWidth = 800
       , showDifficultyModal = True
+      , showLeaderBoardModal = False
       , leaderBoard = LeaderBoard.init
       }
     , Cmd.batch
@@ -142,6 +143,21 @@ update msg model =
 
         ShowDifficultyModal ->
             ( { model | showDifficultyModal = True }, Cmd.none )
+
+        ShowLeaderBoardModal ->
+            ( { model | showLeaderBoardModal = True }, Cmd.none )
+
+        CloseLeaderBoardModal ->
+            ( { model | showLeaderBoardModal = False }, Cmd.none )
+
+        ClearLeaderBoard ->
+            let
+                clearedLeaderBoard =
+                    LeaderBoard.clearAll
+            in
+            ( { model | leaderBoard = clearedLeaderBoard }
+            , Ports.saveLeaderboard (LeaderBoard.encode clearedLeaderBoard)
+            )
 
         ViewportResize width ->
             ( { model | viewportWidth = width }, Cmd.none )
@@ -502,6 +518,9 @@ view model =
             if model.showDifficultyModal then
                 [ Modal.difficultySelectionModal ]
 
+            else if model.showLeaderBoardModal then
+                [ Modal.leaderBoardModal model.leaderBoard ]
+
             else
                 []
     in
@@ -551,6 +570,7 @@ headerBarView model =
             ]
             [ headerMineCounterView model.mineCount
             , headerDifficultyButtonView model.difficulty
+            , headerLeaderBoardButtonView
             ]
         , headerResetButtonView model.gameState
         , headerTimerView model.timer
@@ -598,6 +618,23 @@ headerDifficultyButtonView difficulty =
         , Html.Attributes.style "transition" "all 0.2s ease"
         ]
         [ text difficultyText ]
+
+
+headerLeaderBoardButtonView : Html Msg
+headerLeaderBoardButtonView =
+    button
+        [ Html.Events.onClick ShowLeaderBoardModal
+        , Html.Attributes.style "font-size" "14px"
+        , Html.Attributes.style "font-weight" "bold"
+        , Html.Attributes.style "color" Style.colors.text
+        , Html.Attributes.style "background-color" Style.colors.accent
+        , Html.Attributes.style "padding" "6px 10px"
+        , Html.Attributes.style "border-radius" "6px"
+        , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+        , Html.Attributes.style "cursor" "pointer"
+        , Html.Attributes.style "transition" "all 0.2s ease"
+        ]
+        [ text "🏆" ]
 
 
 headerResetButtonView : GameState -> Html Msg

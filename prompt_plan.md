@@ -239,12 +239,12 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [ ] Style with theme colors
 - **Output**: Win celebration modal
 
-### Task 18: Leaderboard Modal
-- [ ] Add trophy icon to header
-- [ ] Create leaderboard modal view
-- [ ] Display best times by difficulty
-- [ ] Add "Clear Records" button
-- [ ] Implement clear functionality
+### Task 18: Leaderboard Modal ✅
+- [x] Add trophy icon to header
+- [x] Create leaderboard modal view
+- [x] Display best times by difficulty
+- [x] Add "Clear Records" button
+- [x] Implement clear functionality
 - **Output**: Viewable leaderboard
 
 ### Task 19: Final Polish & Testing
