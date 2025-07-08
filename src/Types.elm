@@ -30,6 +30,7 @@ type alias Model =
     , touchStart : Maybe { row : Int, col : Int, time : Time.Posix }
     , timer : Timer.Timer
     , viewportWidth : Int
+    , showDifficultyModal : Bool
     }
 
 
@@ -55,5 +56,6 @@ type Msg
     | NewGame Difficulty
     | TimerTick Time.Posix
     | ResetGame
+    | ShowDifficultyModal
     | ViewportResize Int
     | NoOp

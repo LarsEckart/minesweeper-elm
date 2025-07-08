@@ -214,12 +214,13 @@ Let me refine these chunks one more time to ensure they're the right size:
 - [x] Add viewport meta tag
 - **Output**: Mobile-responsive game
 
-### Task 15: Difficulty Selection Modal
-- [ ] Add difficulty type (Beginner, Intermediate, Expert)
-- [ ] Create landing modal component
-- [ ] Show modal on initial load
-- [ ] Generate appropriate grid size on selection
-- [ ] Close modal and start game
+### Task 15: Difficulty Selection Modal ✅
+- [x] Add difficulty type (Beginner, Intermediate, Expert)
+- [x] Create landing modal component  
+- [x] Show modal on initial load
+- [x] Generate appropriate grid size on selection
+- [x] Close modal and start game
+- [x] Add difficulty button to header for changing difficulty
 - **Output**: Difficulty selection works
 
 ### Task 16: LocalStorage Ports

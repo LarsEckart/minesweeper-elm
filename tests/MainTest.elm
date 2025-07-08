@@ -23,6 +23,7 @@ suite =
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
+                            , showDifficultyModal = False
                             }
 
                         ( updatedModel, _ ) =
@@ -41,6 +42,7 @@ suite =
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
+                            , showDifficultyModal = False
                             }
 
                         ( updatedModel, _ ) =
@@ -59,6 +61,7 @@ suite =
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
+                            , showDifficultyModal = False
                             }
 
                         ( updatedModel, _ ) =
@@ -77,6 +80,7 @@ suite =
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
+                            , showDifficultyModal = False
                             }
 
                         ( updatedModel, _ ) =
@@ -95,6 +99,7 @@ suite =
                             , touchStart = Nothing
                             , timer = Timer.start
                             , viewportWidth = 800
+                            , showDifficultyModal = False
                             }
 
                         ( updatedModel, _ ) =

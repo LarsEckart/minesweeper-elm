@@ -7,12 +7,13 @@ import Html exposing (Html, button, div, h1, text)
 import Html.Attributes
 import Html.Events
 import Json.Decode as Decode
+import Modal
 import Random
 import Style
 import Task
 import Time
 import Timer
-import Types exposing (Board, GameState(..), Model, Msg(..))
+import Types exposing (Board, Difficulty(..), GameState(..), Model, Msg(..))
 
 
 main : Program () Model Msg
@@ -27,21 +28,15 @@ main =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    let
-        seed =
-            Random.initialSeed 42
-
-        board =
-            Board.withMines 9 9 10 seed
-    in
-    ( { board = board
+    ( { board = []
       , gameState = Playing
-      , difficulty = Types.Beginner
+      , difficulty = Beginner
       , isFirstClick = True
       , mineCount = 10
       , touchStart = Nothing
       , timer = Timer.init
       , viewportWidth = 800
+      , showDifficultyModal = True
       }
     , Task.perform ViewportResize (Task.succeed 800)
     )
@@ -77,22 +72,60 @@ update msg model =
             handleTouchEnd row col time model
 
         NewGame difficulty ->
-            -- TODO: Implement new game functionality
-            ( model, Cmd.none )
+            let
+                seed =
+                    Random.initialSeed 42
+
+                ( rows, cols, mines ) =
+                    case difficulty of
+                        Beginner ->
+                            ( 9, 9, 10 )
+
+                        Intermediate ->
+                            ( 16, 16, 40 )
+
+                        Expert ->
+                            ( 16, 30, 99 )
+
+                newBoard =
+                    Board.withMines rows cols mines seed
+            in
+            ( { model
+                | board = newBoard
+                , gameState = Playing
+                , difficulty = difficulty
+                , isFirstClick = True
+                , mineCount = mines
+                , timer = Timer.init
+                , showDifficultyModal = False
+              }
+            , Cmd.none
+            )
 
         ResetGame ->
             let
                 seed =
                     Random.initialSeed 42
 
+                ( rows, cols, mines ) =
+                    case model.difficulty of
+                        Beginner ->
+                            ( 9, 9, 10 )
+
+                        Intermediate ->
+                            ( 16, 16, 40 )
+
+                        Expert ->
+                            ( 16, 30, 99 )
+
                 newBoard =
-                    Board.withMines 9 9 10 seed
+                    Board.withMines rows cols mines seed
             in
             ( { model
                 | board = newBoard
                 , gameState = Playing
                 , isFirstClick = True
-                , mineCount = 10
+                , mineCount = mines
                 , timer = Timer.init
               }
             , Cmd.none
@@ -100,6 +133,9 @@ update msg model =
 
         TimerTick _ ->
             ( { model | timer = Timer.tick model.timer }, Cmd.none )
+
+        ShowDifficultyModal ->
+            ( { model | showDifficultyModal = True }, Cmd.none )
 
         ViewportResize width ->
             ( { model | viewportWidth = width }, Cmd.none )
@@ -361,6 +397,26 @@ view model =
 
             else
                 "20px"
+
+        gameContent =
+            [ h1
+                [ Html.Attributes.style "text-align" "center"
+                , Html.Attributes.style "color" Style.colors.text
+                , Html.Attributes.style "margin-bottom" "20px"
+                , Html.Attributes.style "text-shadow" "2px 2px 4px rgba(0,0,0,0.3)"
+                ]
+                [ text "Minesweeper" ]
+            , gameStatusView model.gameState
+            , headerBarView model
+            , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.viewportWidth model.board
+            ]
+
+        modalContent =
+            if model.showDifficultyModal then
+                [ Modal.difficultySelectionModal ]
+
+            else
+                []
     in
     div
         [ Html.Attributes.style "background-color" Style.colors.background
@@ -369,17 +425,7 @@ view model =
         , Html.Attributes.style "font-family" "Arial, sans-serif"
         , Html.Attributes.style "overflow-x" "auto"
         ]
-        [ h1
-            [ Html.Attributes.style "text-align" "center"
-            , Html.Attributes.style "color" Style.colors.text
-            , Html.Attributes.style "margin-bottom" "20px"
-            , Html.Attributes.style "text-shadow" "2px 2px 4px rgba(0,0,0,0.3)"
-            ]
-            [ text "Minesweeper" ]
-        , gameStatusView model.gameState
-        , headerBarView model
-        , Board.view CellClicked CellRightClicked CellTouchStart CellTouchEnd model.viewportWidth model.board
-        ]
+        (gameContent ++ modalContent)
 
 
 headerBarView : Model -> Html Msg
@@ -411,7 +457,14 @@ headerBarView model =
         , Html.Attributes.style "max-width" "400px"
         , Html.Attributes.style "box-shadow" ("0 4px 8px " ++ Style.colors.shadow)
         ]
-        [ headerMineCounterView model.mineCount
+        [ div
+            [ Html.Attributes.style "display" "flex"
+            , Html.Attributes.style "align-items" "center"
+            , Html.Attributes.style "gap" "10px"
+            ]
+            [ headerMineCounterView model.mineCount
+            , headerDifficultyButtonView model.difficulty
+            ]
         , headerResetButtonView model.gameState
         , headerTimerView model.timer
         ]
@@ -429,6 +482,35 @@ headerMineCounterView mineCount =
         , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
         ]
         [ text ("💣 " ++ String.fromInt mineCount) ]
+
+
+headerDifficultyButtonView : Difficulty -> Html Msg
+headerDifficultyButtonView difficulty =
+    let
+        difficultyText =
+            case difficulty of
+                Beginner ->
+                    "B"
+
+                Intermediate ->
+                    "I"
+
+                Expert ->
+                    "E"
+    in
+    button
+        [ Html.Events.onClick ShowDifficultyModal
+        , Html.Attributes.style "font-size" "14px"
+        , Html.Attributes.style "font-weight" "bold"
+        , Html.Attributes.style "color" Style.colors.text
+        , Html.Attributes.style "background-color" Style.colors.accent
+        , Html.Attributes.style "padding" "6px 10px"
+        , Html.Attributes.style "border-radius" "6px"
+        , Html.Attributes.style "border" ("2px solid " ++ Style.colors.border)
+        , Html.Attributes.style "cursor" "pointer"
+        , Html.Attributes.style "transition" "all 0.2s ease"
+        ]
+        [ text difficultyText ]
 
 
 headerResetButtonView : GameState -> Html Msg
