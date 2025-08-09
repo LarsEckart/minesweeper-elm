@@ -37,7 +37,7 @@ suite =
                         |> Expect.equal 0
             ]
         , describe "stop"
-            [ test "stops a running timer" <|
+            [ test "stops a running timer and preserves elapsed time" <|
                 \_ ->
                     Timer.start
                         |> Timer.tick
@@ -45,7 +45,7 @@ suite =
                         |> Timer.stop
                         |> Timer.tick
                         |> Timer.getSeconds
-                        |> Expect.equal 0
+                        |> Expect.equal 2
             ]
         , describe "formatTime"
             [ test "formats seconds under 60" <|

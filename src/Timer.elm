@@ -4,13 +4,13 @@ import Time
 
 
 type Timer
-    = Stopped
+    = Stopped Int
     | Running Int
 
 
 init : Timer
 init =
-    Stopped
+    Stopped 0
 
 
 start : Timer
@@ -21,18 +21,18 @@ start =
 stop : Timer -> Timer
 stop timer =
     case timer of
-        Stopped ->
-            Stopped
+        Stopped elapsed ->
+            Stopped elapsed
 
         Running seconds ->
-            Stopped
+            Stopped seconds
 
 
 tick : Timer -> Timer
 tick timer =
     case timer of
-        Stopped ->
-            Stopped
+        Stopped elapsed ->
+            Stopped elapsed
 
         Running seconds ->
             Running (seconds + 1)
@@ -41,8 +41,8 @@ tick timer =
 getSeconds : Timer -> Int
 getSeconds timer =
     case timer of
-        Stopped ->
-            0
+        Stopped elapsed ->
+            elapsed
 
         Running seconds ->
             seconds
