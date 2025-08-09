@@ -1,6 +1,6 @@
 {
   "name": "minesweeper-elm",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A modern Minesweeper game built with Elm",
   "scripts": {
     "build-sw": "node scripts/build-sw.js"

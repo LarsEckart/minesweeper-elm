@@ -55,7 +55,7 @@
     // Parse seed from URL parameters
     var urlParams = new URLSearchParams(window.location.search);
     var seedParam = urlParams.get('seed');
-    var seed = seedParam ? parseInt(seedParam, 10) : null;
+    var seed = seedParam ? parseInt(seedParam, 10) : Math.floor(Date.now());
     
     var app = Elm.Main.init({
       node: document.getElementById('elm'),
