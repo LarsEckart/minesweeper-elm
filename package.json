@@ -1,0 +1,11 @@
+{
+  "name": "minesweeper-elm",
+  "version": "1.0.0",
+  "description": "A modern Minesweeper game built with Elm",
+  "scripts": {
+    "build-sw": "node scripts/build-sw.js"
+  },
+  "keywords": ["minesweeper", "elm", "game", "pwa"],
+  "author": "Lars",
+  "license": "MIT"
+}

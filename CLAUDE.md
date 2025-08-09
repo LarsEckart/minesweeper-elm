@@ -23,8 +23,9 @@ A modern Minesweeper game built with Elm 0.19
 3. Implement changes directly on main, keep commits small and focused
 4. Verify continuously: Run `./check.sh` frequently
 5. Use Playwright MCP to verify the game also from user's perspective
-6. Commit often with small, descriptive commits
-7. Push frequently to main branch
+6. **IMPORTANT**: Bump version in `package.json` when making changes (for PWA cache invalidation)
+7. Commit often with small, descriptive commits
+8. Push frequently to main branch
 
 **Key Principles:**
 - Work directly on main branch
@@ -32,3 +33,4 @@ A modern Minesweeper game built with Elm 0.19
 - Push frequently to share progress
 - Use feature flags for incomplete features
 - Always ensure main is in working state
+- Always bump version in `package.json` for changes (enables PWA cache updates)
