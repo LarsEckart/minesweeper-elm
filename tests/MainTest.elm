@@ -29,6 +29,7 @@ suite =
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             , seed = 42
+                            , version = "1.0.2"
                             }
 
                         ( updatedModel, _ ) =
@@ -52,6 +53,7 @@ suite =
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             , seed = 42
+                            , version = "1.0.2"
                             }
 
                         ( updatedModel, _ ) =
@@ -75,6 +77,7 @@ suite =
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             , seed = 42
+                            , version = "1.0.2"
                             }
 
                         ( updatedModel, _ ) =
@@ -98,6 +101,7 @@ suite =
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             , seed = 42
+                            , version = "1.0.2"
                             }
 
                         ( updatedModel, _ ) =
@@ -121,6 +125,7 @@ suite =
                             , showWinModal = False
                             , leaderBoard = LeaderBoard.init
                             , seed = 42
+                            , version = "1.0.2"
                             }
 
                         ( updatedModel, _ ) =

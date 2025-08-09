@@ -5,6 +5,12 @@ import Time
 import Timer
 
 
+type alias Flags =
+    { seed : Maybe Int
+    , version : String
+    }
+
+
 type CellState
     = Hidden
     | Revealed
@@ -36,6 +42,7 @@ type alias Model =
     , showWinModal : Bool
     , leaderBoard : LeaderBoard.LeaderBoard
     , seed : Int
+    , version : String
     }
 
 

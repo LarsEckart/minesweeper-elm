@@ -15,10 +15,10 @@ import Style
 import Task
 import Time
 import Timer
-import Types exposing (Board, GameState(..), Model, Msg(..))
+import Types exposing (Board, Flags, GameState(..), Model, Msg(..))
 
 
-main : Program (Maybe Int) Model Msg
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
@@ -28,11 +28,11 @@ main =
         }
 
 
-init : Maybe Int -> ( Model, Cmd Msg )
-init maybeSeed =
+init : Flags -> ( Model, Cmd Msg )
+init flags =
     let
         seedValue =
-            case maybeSeed of
+            case flags.seed of
                 Just s ->
                     s
 
@@ -52,6 +52,7 @@ init maybeSeed =
       , showWinModal = False
       , leaderBoard = LeaderBoard.init
       , seed = seedValue
+      , version = flags.version
       }
     , Cmd.batch
         [ Task.perform ViewportResize (Task.succeed 800)
@@ -571,7 +572,20 @@ view model =
         , Html.Attributes.style "font-family" "Arial, sans-serif"
         , Html.Attributes.style "overflow-x" "auto"
         ]
-        (gameContent ++ modalContent)
+        (gameContent ++ modalContent ++ [ versionView model.version ])
+
+
+versionView : String -> Html Msg
+versionView version =
+    div
+        [ Html.Attributes.style "position" "fixed"
+        , Html.Attributes.style "bottom" "10px"
+        , Html.Attributes.style "right" "10px"
+        , Html.Attributes.style "color" "rgba(255, 255, 255, 0.5)"
+        , Html.Attributes.style "font-size" "12px"
+        , Html.Attributes.style "font-family" "monospace"
+        ]
+        [ text ("v" ++ version) ]
 
 
 headerBarView : Model -> Html Msg
